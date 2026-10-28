@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Work Orders — SeemaSetu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Work Order Management</h1>
+    <p class="page-subtitle">Coordinate engineering units, assign repair orders, and monitor completion progress.</p>
+  </div>
+  {% if session.get('role') in ['admin', 'officer'] %}
+    <a href="{{ url_for('work_orders.create') }}" class="btn btn-accent">+ Create New Work Order</a>
+  {% endif %}
+</div>
+
+<!-- Filter Bar -->
+<form method="GET" action="{{ url_for('work_orders.list_work_orders') }}" class="filter-bar">
+  <div class="filter-item" style="flex: 2;">
+    <label class="form-label" style="font-size: 0.78rem;">Search</label>
+    <input type="text" name="search" class="form-control" placeholder="Search order #, contractor, or engineer..." value="{{ current_search }}">
+  </div>
+
+  <div class="filter-item">
+    <label class="form-label" style="font-size: 0.78rem;">Status</label>
+    <select name="status" class="form-control">
+      <option value="">All Statuses</option>
+      {% for st in statuses %}
+        <option value="{{ st }}" {% if current_status == st %}selected{% endif %}>{{ st }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('work_orders.list_work_orders') }}" class="btn btn-secondary">Reset</a>
+  </div>
+</form>
+
+<div class="card">
+  {% if work_orders %}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Order No</th>
+            <th>Linked Issue</th>
+            <th>Contractor / Task Force</th>
+            <th>Lead Engineer</th>
+            <th>Target Date</th>
+            <th>Est. Budget</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for wo in work_orders %}
+            <tr>
+              <td><strong>{{ wo.work_order_no }}</strong></td>
+              <td>
+                <a href="{{ url_for('issues.detail', issue_id=wo.issue_id) }}" style="font-weight: 600; color: var(--primary);">
+                  {{ wo.ticket_number }}: {{ wo.issue_title|truncate(35) }}
+                </a>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">{{ wo.sector }}</div>
+              </td>
+              <td>{{ wo.contractor_or_unit }}</td>
+              <td>{{ wo.lead_engineer }}</td>
+              <td>{{ wo.target_date|format_date }}</td>
+              <td>{{ wo.estimated_cost|currency }}</td>
+              <td style="min-width: 140px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.2rem;">
+                  <span>Progress</span>
+                  <strong>{{ wo.progress_percentage }}%</strong>
+                </div>
+                <div class="score-progress-bar" style="height: 6px;">
+                  <div class="score-progress-fill" style="width: {{ wo.progress_percentage }}%; background-color: var(--accent);"></div>
+                </div>
+              </td>
+              <td>
+                <span class="status-pill status-{{ wo.status|replace(' ', '-') }}">{{ wo.status }}</span>
+              </td>
+              <td>
+                <a href="{{ url_for('work_orders.detail', wo_id=wo.id) }}" class="btn btn-sm btn-secondary">
+                  Manage &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+      <p style="font-size: 1.1rem; font-weight: 600;">No work orders found.</p>
+      {% if session.get('role') in ['admin', 'officer'] %}
+        <a href="{{ url_for('work_orders.create') }}" class="btn btn-accent btn-sm" style="margin-top: 0.75rem;">+ Create First Work Order</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

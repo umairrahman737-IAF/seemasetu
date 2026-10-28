@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Report Infrastructure Issue — SeemaSetu{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Report Border Infrastructure Defect</h1>
+      <p class="page-subtitle">Submit unclassified field observation with automatic rule-based priority evaluation.</p>
+    </div>
+    <a href="{{ url_for('issues.list_issues') }}" class="btn btn-secondary">&larr; Back to Issues</a>
+  </div>
+
+  <div class="card">
+    <form id="issue-report-form" method="POST" action="{{ url_for('issues.create_issue') }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-grid">
+        <!-- Title -->
+        <div class="form-group full-width">
+          <label class="form-label" for="title">Issue Title <span class="required">*</span></label>
+          <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Scouring and partial collapse of culvert bridge apron" value="{{ form.get('title', '') }}" required>
+          <div class="form-hint">Provide a concise summary describing the physical damage or outage.</div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label" for="category-select">Infrastructure Category <span class="required">*</span></label>
+          <select id="category-select" name="category" class="form-control" required>
+            {% for cat in categories %}
+              <option value="{{ cat }}" {% if form.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Border Sector -->
+        <div class="form-group">
+          <label class="form-label" for="sector">Border Sector <span class="required">*</span></label>
+          <select id="sector" name="sector" class="form-control" required>
+            {% for sec in sectors %}
+              <option value="{{ sec }}" {% if form.get('sector') == sec %}selected{% endif %}>{{ sec }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Specific Location Name -->
+        <div class="form-group">
+          <label class="form-label" for="location_name">Specific Location / Landmark <span class="required">*</span></label>
+          <input type="text" id="location_name" name="location_name" class="form-control" placeholder="e.g. Himjyoti Pass Link Road Km 34.2" value="{{ form.get('location_name', '') }}" required>
+        </div>
+
+        <!-- Fictional Coordinates -->
+        <div class="form-group">
+          <label class="form-label" for="coordinates">Demonstration Coordinates (Fictional)</label>
+          <input type="text" id="coordinates" name="coordinates" class="form-control" placeholder="e.g. 34.2180° N, 77.4120° E" value="{{ form.get('coordinates', '') }}">
+          <div class="form-hint">Note: Only non-sensitive, fictional coordinates are permitted.</div>
+        </div>
+
+        <!-- Severity -->
+        <div class="form-group">
+          <label class="form-label" for="severity-select">Physical Severity <span class="required">*</span></label>
+          <select id="severity-select" name="severity" class="form-control" required>
+            {% for sev in severities %}
+              <option value="{{ sev }}" {% if form.get('severity', 'Medium') == sev %}selected{% endif %}>{{ sev }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-hint">Critical: Complete impassability or structural risk.</div>
+        </div>
+
+        <!-- Urgency -->
+        <div class="form-group">
+          <label class="form-label" for="urgency-select">Operational Urgency <span class="required">*</span></label>
+          <select id="urgency-select" name="urgency" class="form-control" required>
+            {% for urg in urgencies %}
+              <option value="{{ urg }}" {% if form.get('urgency', 'Moderate') == urg %}selected{% endif %}>{{ urg }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-hint">Immediate: Civilian population or patrol line cut off.</div>
+        </div>
+
+        <!-- Weather / Seasonal Risk -->
+        <div class="form-group full-width">
+          <label class="form-label" for="weather-select">Environmental / Weather Vulnerability</label>
+          <select id="weather-select" name="weather_vulnerability" class="form-control">
+            {% for wea in weather_conditions %}
+              <option value="{{ wea }}" {% if form.get('weather_vulnerability', 'Moderate Risk') == wea %}selected{% endif %}>{{ wea }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-hint">Adverse monsoon or freeze-thaw events rapidly escalate structural damage.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full-width">
+          <label class="form-label" for="description">Detailed Description <span class="required">*</span></label>
+          <textarea id="description" name="description" class="form-control" placeholder="Describe the physical condition, extent of blockage or defect, equipment damage, and any safety hazards observed..." required>{{ form.get('description', '') }}</textarea>
+        </div>
+
+        <!-- Photograph Upload -->
+        <div class="form-group full-width">
+          <label class="form-label" for="image">Attach Field Photograph (Optional)</label>
+          <input type="file" id="image" name="image" class="form-control" accept="image/png, image/jpeg, image/webp">
+          <div class="form-hint">Supported formats: PNG, JPG, JPEG, WEBP (Max 5MB).</div>
+        </div>
+      </div>
+
+      <!-- Live Priority Scoring Preview Box -->
+      <div class="priority-preview-box">
+        <div style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+          Rule-Based Priority Score (Real-Time Live Calculation)
+        </div>
+        <div class="score-display">
+          <div id="preview-score-value" class="score-number">55/100</div>
+          <div>
+            <span id="preview-level-badge" class="badge badge-high" style="font-size: 0.95rem; padding: 0.35rem 0.85rem;">High</span>
+            <div id="preview-recommendation" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">
+              Calculated based on severity, urgency, infrastructure category, and weather vulnerability.
+            </div>
+          </div>
+        </div>
+        <div class="score-progress-bar">
+          <div id="preview-progress-fill" class="score-progress-fill" style="width: 55%; background-color: #ea580c;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.75rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <a href="{{ url_for('issues.list_issues') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-accent" style="padding: 0.7rem 1.75rem; font-size: 0.95rem;">
+          Submit Issue Report &rarr;
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

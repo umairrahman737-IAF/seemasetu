@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Register Reporter Account — SeemaSetu{% endblock %}
+
+{% block content %}
+<div style="max-width: 580px; margin: 2rem auto;">
+  <div class="card" style="box-shadow: var(--shadow-lg);">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">Field Reporter Registration</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Register to submit infrastructure issues and monitor ongoing repair activities.
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="username">Username <span class="required">*</span></label>
+          <input type="text" id="username" name="username" class="form-control" placeholder="e.g. joshi_patrol" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Official Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="name@domain.gov.in" required>
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label" for="full_name">Full Name <span class="required">*</span></label>
+          <input type="text" id="full_name" name="full_name" class="form-control" placeholder="e.g. Sub-Inspector R. Joshi" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="department">Department / Division</label>
+          <input type="text" id="department" name="department" class="form-control" value="Border Roads & Civil Infrastructure" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="badge_number">Badge / ID Number</label>
+          <input type="text" id="badge_number" name="badge_number" class="form-control" placeholder="e.g. FP-REP-88">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password <span class="required">*</span></label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Min 6 characters" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirm_password">Confirm Password <span class="required">*</span></label>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Repeat password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-accent btn-block" style="padding: 0.75rem; font-size: 0.95rem; margin-top: 1rem;">
+        Complete Registration &rarr;
+      </button>
+    </form>
+
+    <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+      Already have credentials? <a href="{{ url_for('auth.login') }}">Sign in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

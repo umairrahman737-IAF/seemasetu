@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}{{ issue.ticket_number }} — {{ issue.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div style="display: flex; gap: 0.6rem; align-items: center; margin-bottom: 0.35rem;">
+      <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">{{ issue.ticket_number }}</span>
+      <span class="status-pill status-{{ issue.status|replace(' ', '-') }}">{{ issue.status }}</span>
+      <span class="badge badge-{{ issue.priority_level|lower }}">{{ issue.priority_level }} (Score: {{ issue.priority_score }}/100)</span>
+    </div>
+    <h1 class="page-title">{{ issue.title }}</h1>
+    <p class="page-subtitle">{{ issue.sector }} &bull; {{ issue.location_name }}</p>
+  </div>
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <a href="{{ url_for('issues.list_issues') }}" class="btn btn-secondary">&larr; Back to List</a>
+    {% if not work_order and session.get('role') in ['admin', 'officer'] %}
+      <a href="{{ url_for('work_orders.create', issue_id=issue.id) }}" class="btn btn-accent">
+        + Assign Work Order
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1.15fr; gap: 1.5rem;">
+
+  <!-- Left Column: Primary Details & Timeline -->
+  <div>
+    <!-- Issue Core Info Card -->
+    <div class="card">
+      <h3 class="card-title">Incident Details &amp; Field Report</h3>
+      <div style="white-space: pre-line; color: #334155; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1.5rem;">
+        {{ issue.description }}
+      </div>
+
+      {% if issue.image_path %}
+        <div style="margin-bottom: 1.5rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-muted);">Attached Field Photograph:</div>
+          <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); max-width: 500px;">
+            <img src="{{ url_for('static', filename='uploads/' + issue.image_path) }}" alt="Issue Evidence" style="width: 100%; height: auto; display: block;" onerror="this.src='https://placehold.co/600x400/1e293b/ffffff?text=Border+Civil+Infrastructure+Photo';">
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="form-grid" style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Infrastructure Category</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ issue.category }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Demonstration Coordinates</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ issue.coordinates or 'Unspecified' }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Reported By</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ issue.reporter_name }} ({{ issue.reporter_badge or 'Field' }})</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Reported On</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ issue.created_at|format_datetime }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linked Work Order Section if exists -->
+    {% if work_order %}
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <div class="card-title">
+          <span>Linked Work Order: {{ work_order.work_order_no }}</span>
+          <span class="status-pill status-{{ work_order.status|replace(' ', '-') }}">{{ work_order.status }}</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          Assigned to <strong>{{ work_order.contractor_or_unit }}</strong> under Lead Engineer <strong>{{ work_order.lead_engineer }}</strong>.
+        </p>
+        <div style="margin-bottom: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem;">
+            <span>Repair Execution Progress</span>
+            <span>{{ work_order.progress_percentage }}%</span>
+          </div>
+          <div class="score-progress-bar">
+            <div class="score-progress-fill" style="width: {{ work_order.progress_percentage }}%; background-color: var(--accent);"></div>
+          </div>
+        </div>
+        <a href="{{ url_for('work_orders.detail', wo_id=work_order.id) }}" class="btn btn-sm btn-secondary">
+          Manage Work Order &amp; Allocate Resources &rarr;
+        </a>
+      </div>
+    {% endif %}
+
+    <!-- Status History / Timeline Card -->
+    <div class="card">
+      <h3 class="card-title">Incident Activity Timeline &amp; Notes</h3>
+      <div class="timeline">
+        {% for item in timeline %}
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-header">
+              <span class="timeline-user">{{ item.user_name }} ({{ item.user_role }})</span>
+              <span class="timeline-time">{{ item.created_at|format_datetime }}</span>
+            </div>
+            <div class="timeline-body">
+              <div style="font-weight: 600; font-size: 0.82rem; margin-bottom: 0.2rem; color: var(--primary);">
+                Action: <code>{{ item.action }}</code>
+                {% if item.previous_status and item.new_status %}
+                  &bull; {{ item.previous_status }} &rarr; <strong>{{ item.new_status }}</strong>
+                {% endif %}
+              </div>
+              <div>{{ item.remarks }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Priority Score Breakdown & Management Actions -->
+  <div>
+    <!-- Rule-Based Priority Score Breakdown Card -->
+    <div class="card">
+      <h3 class="card-title">Rule-Based Priority Breakdown</h3>
+      <div class="priority-preview-box" style="margin-top: 0; background: #ffffff; border: 1px solid var(--border-color);">
+        <div class="score-display">
+          <div class="score-number">{{ issue.priority_score }}/100</div>
+          <div>
+            <span class="badge badge-{{ issue.priority_level|lower }}" style="font-size: 0.95rem; padding: 0.35rem 0.85rem;">
+              {{ issue.priority_level }}
+            </span>
+          </div>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+          {{ prio_details.recommendation }}
+        </p>
+
+        <!-- Factor Breakdown List -->
+        <div style="font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.6rem; border-top: 1px solid #e2e8f0; padding-top: 0.85rem;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Severity ({{ issue.severity }})</span>
+            <strong>{{ prio_details.breakdown.severity_pts }} / 35 pts</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Urgency ({{ issue.urgency }})</span>
+            <strong>{{ prio_details.breakdown.urgency_pts }} / 25 pts</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Category Criticality ({{ issue.category }})</span>
+            <strong>{{ prio_details.breakdown.category_pts }} / 25 pts</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Weather Risk ({{ issue.weather_vulnerability }})</span>
+            <strong>{{ prio_details.breakdown.weather_pts }} / 15 pts</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Status & Operational Notes -->
+    <div class="card">
+      <h3 class="card-title">Update Status &amp; Assign</h3>
+      <form method="POST" action="{{ url_for('issues.update_status', issue_id=issue.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+          <label class="form-label" for="status">Change Incident Status</label>
+          <select id="status" name="status" class="form-control">
+            {% for st in statuses %}
+              <option value="{{ st }}" {% if issue.status == st %}selected{% endif %}>{{ st }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="assigned_to">Assign Officer / Engineer</label>
+          <select id="assigned_to" name="assigned_to" class="form-control">
+            <option value="">Unassigned</option>
+            {% for off in officers %}
+              <option value="{{ off.id }}" {% if issue.assigned_to == off.id %}selected{% endif %}>
+                {{ off.full_name }} ({{ off.department }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="remarks">Operational Remarks / Note</label>
+          <textarea id="remarks" name="remarks" class="form-control" style="min-height: 80px;" placeholder="Add progress notes, patrol confirmation, or inspection remarks..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Save Status &amp; Note</button>
+      </form>
+    </div>
+
+    <!-- Recalculate Priority Score Form -->
+    <div class="card">
+      <h3 class="card-title">Re-score Priority</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+        Recalculate rule-based priority score if weather hazards, urgency, or ground conditions have altered.
+      </p>
+      <form method="POST" action="{{ url_for('issues.recalculate_priority', issue_id=issue.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 0.8rem;">Current Severity</label>
+          <select name="severity" class="form-control">
+            <option value="Critical" {% if issue.severity == 'Critical' %}selected{% endif %}>Critical (35 pts)</option>
+            <option value="High" {% if issue.severity == 'High' %}selected{% endif %}>High (25 pts)</option>
+            <option value="Medium" {% if issue.severity == 'Medium' %}selected{% endif %}>Medium (15 pts)</option>
+            <option value="Low" {% if issue.severity == 'Low' %}selected{% endif %}>Low (5 pts)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 0.8rem;">Current Urgency</label>
+          <select name="urgency" class="form-control">
+            <option value="Immediate" {% if issue.urgency == 'Immediate' %}selected{% endif %}>Immediate (25 pts)</option>
+            <option value="High" {% if issue.urgency == 'High' %}selected{% endif %}>High (18 pts)</option>
+            <option value="Moderate" {% if issue.urgency == 'Moderate' %}selected{% endif %}>Moderate (10 pts)</option>
+            <option value="Routine" {% if issue.urgency == 'Routine' %}selected{% endif %}>Routine (5 pts)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 0.8rem;">Weather Vulnerability</label>
+          <select name="weather_vulnerability" class="form-control">
+            <option value="Severe/Imminent" {% if issue.weather_vulnerability == 'Severe/Imminent' %}selected{% endif %}>Severe/Imminent (15 pts)</option>
+            <option value="Moderate Risk" {% if issue.weather_vulnerability == 'Moderate Risk' %}selected{% endif %}>Moderate Risk (10 pts)</option>
+            <option value="Normal/Stable" {% if issue.weather_vulnerability == 'Normal/Stable' %}selected{% endif %}>Normal/Stable (5 pts)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-secondary btn-block">Re-calculate Score</button>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
