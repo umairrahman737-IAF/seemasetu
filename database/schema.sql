@@ -1,7 +1,7 @@
 -- =====================================================================
 -- SeemaSetu Database Schema
 -- Border Infrastructure Monitoring and Maintenance System
--- Compatible with MySQL 8.0+ and cloud-hosted MySQL / TiDB / PlanetScale
+-- Compatible with MySQL 8.0+, SQLite (via translation layer), and cloud-hosted MySQL
 -- =====================================================================
 
 CREATE TABLE IF NOT EXISTS users (
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    role VARCHAR(20) NOT NULL DEFAULT 'user', -- 'admin', 'officer', 'user'
+    role VARCHAR(20) NOT NULL DEFAULT 'viewer', -- 'admin', 'engineer', 'maintenance', 'viewer'
     department VARCHAR(100) DEFAULT 'Border Roads & Civil Infrastructure',
     badge_number VARCHAR(50) DEFAULT NULL,
     is_active TINYINT(1) DEFAULT 1,

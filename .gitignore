@@ -43,6 +43,7 @@ app/static/uploads/issue_*
 # IDE & OS
 .vscode/
 .idea/
+.vercel/
 *.swp
 *.swo
 .DS_Store

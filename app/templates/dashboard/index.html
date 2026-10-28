@@ -12,7 +12,7 @@
     <a href="{{ url_for('issues.create_issue') }}" class="btn btn-accent">
       + Report New Issue
     </a>
-    {% if session.get('role') in ['admin', 'officer'] %}
+    {% if session.get('role') in ['admin', 'engineer', 'officer'] %}
       <a href="{{ url_for('work_orders.create') }}" class="btn btn-primary">
         + Assign Work Order
       </a>
@@ -27,7 +27,7 @@
 {% if low_stock_resources %}
   <div class="alert alert-warning" style="margin-bottom: 1.5rem;">
     <div>
-      <strong>⚠️ Logistics Alert:</strong> {{ low_stock_resources|length }} maintenance item(s) below reserve threshold:
+      <strong>⚠️ Logistics Alert:</strong> {{ low_stock_resources|length }} maintenance asset(s) below reserve threshold:
       {% for item in low_stock_resources[:3] %}
         <span>[{{ item.name }}: {{ item.quantity }} {{ item.unit }}]</span>{% if not loop.last %}, {% endif %}
       {% endfor %}
@@ -37,37 +37,66 @@
   </div>
 {% endif %}
 
-<!-- Key Metrics KPI Grid -->
+<!-- Primary Incident & Operational KPI Grid -->
 <div class="kpi-grid">
   <div class="kpi-card">
-    <div class="kpi-label">Total Reported Issues</div>
+    <div class="kpi-label">Total Reported Defects</div>
     <div class="kpi-value">{{ total_issues }}</div>
-    <div class="kpi-subtext">Across all border sectors</div>
+    <div class="kpi-subtext">{{ reported_count }} newly reported &bull; {{ under_review_count }} under review</div>
   </div>
 
   <div class="kpi-card kpi-danger">
     <div class="kpi-label">Critical Priority Active</div>
     <div class="kpi-value" style="color: var(--danger);">{{ critical_priority_count }}</div>
-    <div class="kpi-subtext">Immediate response required</div>
+    <div class="kpi-subtext">Immediate emergency response needed</div>
   </div>
 
   <div class="kpi-card kpi-warning">
     <div class="kpi-label">Active Work Orders</div>
     <div class="kpi-value" style="color: var(--warning);">{{ active_work_orders }}</div>
-    <div class="kpi-subtext">{{ total_work_orders }} total work orders issued</div>
+    <div class="kpi-subtext">{{ completed_work_orders }} completed of {{ total_work_orders }} total orders</div>
   </div>
 
   <div class="kpi-card kpi-success">
-    <div class="kpi-label">Resolved / Restored</div>
-    <div class="kpi-value" style="color: var(--success);">{{ resolved_count }}</div>
-    <div class="kpi-subtext">Resolution Rate: <strong>{{ resolution_rate }}%</strong></div>
+    <div class="kpi-label">Restoration Rate</div>
+    <div class="kpi-value" style="color: var(--success);">{{ resolution_rate }}%</div>
+    <div class="kpi-subtext">{{ resolved_count }} of {{ total_issues }} issues resolved</div>
   </div>
 </div>
 
-<!-- Resolution Progress Bar Card -->
+<!-- Financial Cost Comparison Card: Estimated vs. Actual Maintenance Costs -->
+<div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(to right, #ffffff, #f8fafc);">
+  <div class="card-title">
+    <span>Maintenance Cost Comparison &amp; Financial Governance</span>
+    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">Work Order Budget Tracking</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+    <div style="padding: 1rem; border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0;">
+      <div style="font-size: 0.8rem; text-transform: uppercase; color: #166534; font-weight: 700;">Total Allocated Budget</div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #14532d; margin-top: 0.25rem;">{{ total_estimated_cost|currency }}</div>
+      <div style="font-size: 0.75rem; color: #15803d; margin-top: 0.2rem;">Initial sanction across all work orders</div>
+    </div>
+
+    <div style="padding: 1rem; border-radius: 8px; background: #fffbeb; border: 1px solid #fde68a;">
+      <div style="font-size: 0.8rem; text-transform: uppercase; color: #92400e; font-weight: 700;">Actual Expenditure Recorded</div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #78350f; margin-top: 0.25rem;">{{ total_actual_cost|currency }}</div>
+      <div style="font-size: 0.75rem; color: #b45309; margin-top: 0.2rem;">Incurred civil &amp; material expenses</div>
+    </div>
+
+    <div style="padding: 1rem; border-radius: 8px; background: #eff6ff; border: 1px solid #bfdbfe;">
+      <div style="font-size: 0.8rem; text-transform: uppercase; color: #1e40af; font-weight: 700;">Budget Variance / Balance</div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #1e3a8a; margin-top: 0.25rem;">{{ cost_variance|currency }}</div>
+      <div style="font-size: 0.75rem; color: #2563eb; margin-top: 0.2rem;">
+        {% if cost_variance >= 0 %}Within approved sanction{% else %}Expenditure overrun warning{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Restoration Progress Bar Card -->
 <div class="card" style="padding: 1.15rem 1.5rem; margin-bottom: 1.5rem;">
   <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.5rem;">
-    <span>Overall Border Infrastructure Restoration Rate</span>
+    <span>Overall Border Infrastructure Restoration Lifecycle</span>
     <span>{{ resolved_count }} of {{ total_issues }} issues resolved ({{ resolution_rate }}%)</span>
   </div>
   <div class="score-progress-bar" style="height: 10px;">
@@ -76,11 +105,11 @@
 </div>
 
 <!-- Interactive Analytics Charts Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
   <!-- Chart 1: Category Distribution -->
   <div class="card">
     <div class="card-title">Issues by Infrastructure Category</div>
-    <div style="height: 260px; position: relative;">
+    <div style="height: 250px; position: relative;">
       <canvas id="categoryChart"></canvas>
     </div>
   </div>
@@ -88,7 +117,7 @@
   <!-- Chart 2: Priority Score Ranks -->
   <div class="card">
     <div class="card-title">Rule-Based Priority Breakdown</div>
-    <div style="height: 260px; position: relative;">
+    <div style="height: 250px; position: relative;">
       <canvas id="priorityChart"></canvas>
     </div>
   </div>
@@ -96,7 +125,7 @@
   <!-- Chart 3: Status Distribution -->
   <div class="card">
     <div class="card-title">Repair Lifecycle Status</div>
-    <div style="height: 260px; position: relative;">
+    <div style="height: 250px; position: relative;">
       <canvas id="statusChart"></canvas>
     </div>
   </div>
@@ -155,7 +184,7 @@
 </div>
 
 <!-- Lower Section: Sector Summary & Recent Audit Log -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
   <!-- Sector Breakdown -->
   <div class="card">
     <div class="card-title">Sector Incident Distribution</div>
@@ -181,7 +210,7 @@
 
   <!-- Recent Audit Feed -->
   <div class="card">
-    <div class="card-title">Recent System Activities</div>
+    <div class="card-title">Recent System Security Activities</div>
     <div class="table-responsive">
       <table class="data-table">
         <thead>
@@ -195,7 +224,7 @@
         <tbody>
           {% for act in recent_activity %}
             <tr>
-              <td style="font-size: 0.8rem;">{{ act.created_at|format_datetime }}</td>
+              <td style="font-size: 0.8rem; white-space: nowrap;">{{ act.created_at|format_datetime }}</td>
               <td><strong>{{ act.username }}</strong></td>
               <td><code>{{ act.action }}</code></td>
               <td style="font-size: 0.82rem; color: var(--text-muted);">{{ act.details }}</td>
@@ -214,7 +243,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // 1. Category Chart (Doughnut)
   const catLabels = {{ chart_categories|safe }};
   const catData = {{ chart_cat_counts|safe }};
-  
   const ctxCat = document.getElementById('categoryChart');
   if (ctxCat && catLabels.length > 0) {
     new Chart(ctxCat, {
@@ -267,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 3. Status Chart (Doughnut)
+  // 3. Status Chart (Pie)
   const statusLabels = {{ chart_status_labels|safe }};
   const statusData = {{ chart_status_counts|safe }};
   const ctxStatus = document.getElementById('statusChart');

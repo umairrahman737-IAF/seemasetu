@@ -10,7 +10,7 @@
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Command Navigation Bar -->
   <nav class="navbar">
     <a href="{{ url_for('dashboard.index') }}" class="nav-brand">
       <div class="brand-icon">SS</div>
@@ -27,6 +27,7 @@
         <li><a href="{{ url_for('work_orders.list_work_orders') }}" class="nav-link {% if 'work_orders' in request.endpoint %}active{% endif %}">Work Orders</a></li>
         <li><a href="{{ url_for('resources.list_resources') }}" class="nav-link {% if 'resources' in request.endpoint %}active{% endif %}">Resources</a></li>
         {% if session.get('role') == 'admin' %}
+          <li><a href="{{ url_for('auth.admin_users') }}" class="nav-link {% if 'admin_users' in request.endpoint %}active{% endif %}">Users</a></li>
           <li><a href="{{ url_for('audit.list_logs') }}" class="nav-link {% if 'audit' in request.endpoint %}active{% endif %}">Audit Trail</a></li>
         {% endif %}
       {% else %}
@@ -37,7 +38,7 @@
     <div class="nav-auth">
       {% if session.get('user_id') %}
         <div class="user-badge">
-          <span class="user-role-pill user-role-{{ session.get('role') }}">{{ session.get('role') }}</span>
+          <span class="user-role-pill user-role-{{ session.get('role', 'viewer') }}">{{ session.get('role', 'viewer') }}</span>
           <a href="{{ url_for('auth.profile') }}" style="color: #ffffff; font-weight: 600;">{{ session.get('full_name') }}</a>
         </div>
         <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Sign Out</a>
@@ -48,7 +49,7 @@
     </div>
   </nav>
 
-  <!-- Main Body Content -->
+  <!-- Main Body Container -->
   <main class="main-container">
     <!-- Flash Messages Container -->
     <div class="flash-container">
@@ -71,7 +72,7 @@
   <footer class="footer">
     <div><strong>SeemaSetu</strong> &mdash; Border Infrastructure Monitoring and Maintenance System &copy; {{ current_year }}</div>
     <div class="footer-disclaimer">
-      [Fictional Demonstration System] All regions, coordinates, tickets, and facility records are unclassified synthetic demonstration data.
+      [Fictional Demonstration System] All border sectors, coordinates, tickets, and facility records are unclassified synthetic demonstration data.
     </div>
   </footer>
 

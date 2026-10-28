@@ -1,3 +1,9 @@
+"""
+Work Orders Blueprint for SeemaSetu.
+Encompasses creation, progress updates, contractor assignment,
+financial cost recording (budget vs. actual), and resource deductions.
+"""
+
 import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.db import query_db, execute_db
@@ -7,7 +13,9 @@ work_orders_bp = Blueprint('work_orders', __name__, url_prefix='/work-orders')
 
 WO_STATUSES = ['Assigned', 'In Progress', 'Under Inspection', 'Completed', 'Delayed']
 
+
 def generate_work_order_number():
+    """Generate a clean sequential-like work order identifier (e.g. WO-2026-0004)."""
     year = datetime.datetime.now().strftime('%Y')
     last_wo = query_db("SELECT id FROM work_orders ORDER BY id DESC LIMIT 1", one=True)
     next_id = (last_wo['id'] + 1) if last_wo else 1
@@ -17,9 +25,10 @@ def generate_work_order_number():
 @work_orders_bp.route('/')
 @login_required
 def list_work_orders():
+    """Browse and filter work orders across sectors and units."""
     status = request.args.get('status', '').strip()
     search = request.args.get('search', '').strip()
-    
+
     query = """
         SELECT w.*, i.ticket_number, i.title as issue_title, i.priority_level, i.sector,
                u.full_name as creator_name
@@ -29,7 +38,7 @@ def list_work_orders():
         WHERE 1=1
     """
     params = []
-    
+
     if status:
         query += " AND w.status = %s"
         params.append(status)
@@ -37,11 +46,11 @@ def list_work_orders():
         query += " AND (w.work_order_no LIKE %s OR w.contractor_or_unit LIKE %s OR w.lead_engineer LIKE %s OR i.ticket_number LIKE %s)"
         like_term = f"%{search}%"
         params.extend([like_term, like_term, like_term, like_term])
-        
+
     query += " ORDER BY w.created_at DESC"
-    
+
     work_orders = query_db(query, tuple(params))
-    
+
     return render_template(
         'work_orders/list.html',
         work_orders=work_orders,
@@ -53,49 +62,85 @@ def list_work_orders():
 
 @work_orders_bp.route('/create', methods=['GET', 'POST'])
 @login_required
-@role_required('admin', 'officer')
+@role_required('admin', 'engineer')
 def create():
+    """Create a new maintenance work order linked to an active issue ticket."""
     issue_id = request.args.get('issue_id')
-    
-    # Available issues without an active work order
+
+    # Available issues without an active open work order
     available_issues = query_db(
         """
         SELECT id, ticket_number, title, category, priority_level, sector
         FROM issues
-        WHERE id NOT IN (SELECT issue_id FROM work_orders WHERE status != 'Completed')
+        WHERE id NOT IN (SELECT issue_id FROM work_orders WHERE status NOT IN ('Completed', 'Closed'))
         ORDER BY priority_score DESC
         """
     )
-    
-    # Resources for optional direct allocation
+
+    # Inventory materials for optional initial allocation
     resources = query_db("SELECT id, name, category, quantity, unit FROM resources WHERE quantity > 0")
-    
+
     if request.method == 'POST':
         token = request.form.get('csrf_token')
         if not validate_csrf(token):
-            flash('Security validation failed.', 'danger')
+            flash('Security validation failed. Please try again.', 'danger')
             return redirect(url_for('work_orders.create'))
-            
+
         selected_issue_id = request.form.get('issue_id')
         contractor = request.form.get('contractor_or_unit', '').strip()
         lead_engineer = request.form.get('lead_engineer', '').strip()
-        estimated_cost = request.form.get('estimated_cost', '0').strip()
-        start_date = request.form.get('start_date', '').strip()
-        target_date = request.form.get('target_date', '').strip()
+        estimated_cost_str = request.form.get('estimated_cost', '0').strip()
+        start_date_str = request.form.get('start_date', '').strip()
+        target_date_str = request.form.get('target_date', '').strip()
         scope_of_work = request.form.get('scope_of_work', '').strip()
-        
-        if not (selected_issue_id and contractor and lead_engineer and start_date and target_date and scope_of_work):
-            flash('Please fill in all mandatory fields.', 'warning')
+
+        # Validation
+        if not (selected_issue_id and contractor and lead_engineer and start_date_str and target_date_str and scope_of_work):
+            flash('Please complete all mandatory work order fields.', 'warning')
             return render_template(
                 'work_orders/create.html',
                 available_issues=available_issues,
                 resources=resources,
                 preselected_issue_id=issue_id
             )
-            
+
+        try:
+            estimated_cost = float(estimated_cost_str or 0)
+            if estimated_cost < 0:
+                flash('Estimated budget cannot be negative.', 'warning')
+                return render_template(
+                    'work_orders/create.html',
+                    available_issues=available_issues,
+                    resources=resources,
+                    preselected_issue_id=issue_id
+                )
+        except ValueError:
+            flash('Invalid estimated cost format.', 'warning')
+            return render_template(
+                'work_orders/create.html',
+                available_issues=available_issues,
+                resources=resources,
+                preselected_issue_id=issue_id
+            )
+
+        # Date Sequence Validation
+        try:
+            d_start = datetime.date.fromisoformat(start_date_str)
+            d_target = datetime.date.fromisoformat(target_date_str)
+            if d_start > d_target:
+                flash('Deployment start date cannot be after the target completion date.', 'warning')
+                return render_template(
+                    'work_orders/create.html',
+                    available_issues=available_issues,
+                    resources=resources,
+                    preselected_issue_id=issue_id
+                )
+        except ValueError:
+            pass
+
         wo_number = generate_work_order_number()
         user_id = session['user_id']
-        
+
         # Insert Work Order
         wo_id = execute_db(
             """
@@ -107,12 +152,12 @@ def create():
             """,
             (
                 wo_number, selected_issue_id, contractor, lead_engineer,
-                float(estimated_cost or 0), start_date, target_date,
+                estimated_cost, start_date_str, target_date_str,
                 scope_of_work, user_id, datetime.datetime.now()
             )
         )
-        
-        # Automatically update issue status to 'Work Order Assigned'
+
+        # Automatically transition linked issue status to 'Work Order Assigned'
         execute_db(
             """
             UPDATE issues 
@@ -121,8 +166,8 @@ def create():
             """,
             (datetime.datetime.now(), selected_issue_id)
         )
-        
-        # Add issue timeline entry
+
+        # Record event in issue audit timeline
         execute_db(
             """
             INSERT INTO issue_timeline (issue_id, user_id, action, previous_status, new_status, remarks, created_at)
@@ -130,41 +175,45 @@ def create():
             """,
             (
                 selected_issue_id, user_id,
-                f"Work order {wo_number} assigned to {contractor} under lead engineer {lead_engineer}.",
+                f"Work Order {wo_number} issued to '{contractor}' under Lead Engineer {lead_engineer}.",
                 datetime.datetime.now()
             )
         )
-        
-        # Optional resource allocation during creation
+
+        # Optional initial inventory deduction
         res_id = request.form.get('resource_id')
         res_qty = request.form.get('resource_quantity')
         if res_id and res_qty:
             try:
                 res_qty_val = float(res_qty)
                 if res_qty_val > 0:
-                    execute_db(
-                        """
-                        INSERT INTO resource_allocations (work_order_id, resource_id, quantity_allocated, allocated_by, allocated_at)
-                        VALUES (%s, %s, %s, %s, %s)
-                        """,
-                        (wo_id, res_id, res_qty_val, user_id, datetime.datetime.now())
-                    )
-                    # Deduct from inventory
-                    execute_db(
-                        "UPDATE resources SET quantity = quantity - %s WHERE id = %s",
-                        (res_qty_val, res_id)
-                    )
+                    res_stock = query_db("SELECT quantity, name, unit FROM resources WHERE id = %s", (res_id,), one=True)
+                    if res_stock and res_stock['quantity'] >= res_qty_val:
+                        execute_db(
+                            """
+                            INSERT INTO resource_allocations (work_order_id, resource_id, quantity_allocated, allocated_by, allocated_at)
+                            VALUES (%s, %s, %s, %s, %s)
+                            """,
+                            (wo_id, res_id, res_qty_val, user_id, datetime.datetime.now())
+                        )
+                        execute_db(
+                            "UPDATE resources SET quantity = quantity - %s WHERE id = %s",
+                            (res_qty_val, res_id)
+                        )
+                        log_audit('RESOURCE_ALLOCATED', 'WorkOrder', wo_id, f"Allocated {res_qty_val} {res_stock['unit']} of {res_stock['name']}")
+                    else:
+                        flash('Note: Requested resource quantity exceeded available stock; order created without initial allocation.', 'warning')
             except ValueError:
                 pass
-                
+
         log_audit(
             'WORK_ORDER_CREATED', 'WorkOrder', wo_number,
-            f"Assigned to {contractor} for issue #{selected_issue_id}"
+            f"Assigned to {contractor} for issue #{selected_issue_id} with budget ₹{estimated_cost:,.2f}"
         )
-        
-        flash(f"Work Order {wo_number} initialized successfully!", 'success')
+
+        flash(f"Work Order {wo_number} issued successfully!", 'success')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
+
     return render_template(
         'work_orders/create.html',
         available_issues=available_issues,
@@ -176,6 +225,7 @@ def create():
 @work_orders_bp.route('/<int:wo_id>')
 @login_required
 def detail(wo_id):
+    """View details of a specific work order, its progress, and allocated assets."""
     wo = query_db(
         """
         SELECT w.*, 
@@ -191,10 +241,9 @@ def detail(wo_id):
         one=True
     )
     if not wo:
-        flash('Work order not found.', 'danger')
+        flash('Requested work order was not found.', 'danger')
         return redirect(url_for('work_orders.list_work_orders'))
-        
-    # Get allocated resources
+
     allocations = query_db(
         """
         SELECT ra.*, r.name as resource_name, r.resource_code, r.unit, r.unit_cost,
@@ -207,10 +256,9 @@ def detail(wo_id):
         """,
         (wo_id,)
     )
-    
-    # Available resources for new allocation
+
     available_resources = query_db("SELECT * FROM resources WHERE quantity > 0")
-    
+
     return render_template(
         'work_orders/detail.html',
         wo=wo,
@@ -222,27 +270,43 @@ def detail(wo_id):
 
 @work_orders_bp.route('/<int:wo_id>/update-progress', methods=['POST'])
 @login_required
+@role_required('admin', 'engineer', 'maintenance')
 def update_progress(wo_id):
+    """Update progress percentage, actual expenditure, and milestone status."""
     token = request.form.get('csrf_token')
     if not validate_csrf(token):
         flash('Security check failed.', 'danger')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
+
     wo = query_db("SELECT * FROM work_orders WHERE id = %s", (wo_id,), one=True)
     if not wo:
         flash('Work order not found.', 'danger')
         return redirect(url_for('work_orders.list_work_orders'))
-        
-    progress = int(request.form.get('progress_percentage', 0))
-    status = request.form.get('status', wo['status'])
-    actual_cost = float(request.form.get('actual_cost', wo['actual_cost']) or 0)
-    remarks = request.form.get('remarks', '').strip()
-    
+
+    try:
+        progress = max(0, min(100, int(request.form.get('progress_percentage', 0))))
+    except ValueError:
+        progress = wo['progress_percentage']
+
+    status = request.form.get('status', wo['status']).strip()
+    if status not in WO_STATUSES:
+        status = wo['status']
+
+    try:
+        actual_cost = float(request.form.get('actual_cost', wo['actual_cost']) or 0)
+        if actual_cost < 0:
+            flash('Actual expenditure cost cannot be negative.', 'warning')
+            return redirect(url_for('work_orders.detail', wo_id=wo_id))
+    except ValueError:
+        actual_cost = wo['actual_cost']
+
     completion_date = None
     if progress == 100 or status == 'Completed':
         completion_date = datetime.date.today()
         status = 'Completed'
-        # Also mark linked issue as Resolved!
+        progress = 100
+
+        # Mark linked issue as Resolved automatically
         execute_db(
             "UPDATE issues SET status = 'Resolved', updated_at = %s WHERE id = %s",
             (datetime.datetime.now(), wo['issue_id'])
@@ -258,13 +322,12 @@ def update_progress(wo_id):
                 datetime.datetime.now()
             )
         )
-    elif status == 'In Progress':
-        # Mark linked issue as In Progress
+    elif status == 'In Progress' and progress > 0:
         execute_db(
             "UPDATE issues SET status = 'In Progress', updated_at = %s WHERE id = %s AND status != 'In Progress'",
             (datetime.datetime.now(), wo['issue_id'])
         )
-        
+
     execute_db(
         """
         UPDATE work_orders 
@@ -273,51 +336,51 @@ def update_progress(wo_id):
         """,
         (progress, status, actual_cost, completion_date, datetime.datetime.now(), wo_id)
     )
-    
+
     log_audit(
         'WORK_ORDER_UPDATED', 'WorkOrder', wo['work_order_no'],
         f"Progress: {progress}% | Status: {status} | Actual Cost: ₹{actual_cost:,.2f}"
     )
-    
+
     flash(f"Work order {wo['work_order_no']} progress updated to {progress}% ({status}).", 'success')
     return redirect(url_for('work_orders.detail', wo_id=wo_id))
 
 
 @work_orders_bp.route('/<int:wo_id>/allocate-resource', methods=['POST'])
 @login_required
-@role_required('admin', 'officer')
+@role_required('admin', 'engineer', 'maintenance')
 def allocate_resource(wo_id):
+    """Allocate materials or assets from depot to a work order and deduct stock."""
     token = request.form.get('csrf_token')
     if not validate_csrf(token):
         flash('Security verification failed.', 'danger')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
+
     resource_id = request.form.get('resource_id')
     quantity = request.form.get('quantity')
-    
+
     if not (resource_id and quantity):
-        flash('Please select a resource and specify quantity.', 'warning')
+        flash('Please select an asset and specify the quantity to allocate.', 'warning')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
+
     try:
         qty_val = float(quantity)
         if qty_val <= 0:
-            flash('Quantity must be greater than zero.', 'warning')
+            flash('Allocation quantity must be greater than zero.', 'warning')
             return redirect(url_for('work_orders.detail', wo_id=wo_id))
     except ValueError:
         flash('Invalid quantity format.', 'warning')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
+
     res = query_db("SELECT * FROM resources WHERE id = %s", (resource_id,), one=True)
     if not res:
-        flash('Resource not found in inventory.', 'danger')
+        flash('Resource item not found in logistics registry.', 'danger')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
+
     if res['quantity'] < qty_val:
-        flash(f"Insufficient stock for {res['name']}. Available: {res['quantity']} {res['unit']}.", 'danger')
+        flash(f"Insufficient stock for '{res['name']}'. Available: {res['quantity']} {res['unit']}.", 'danger')
         return redirect(url_for('work_orders.detail', wo_id=wo_id))
-        
-    # Allocate resource
+
     execute_db(
         """
         INSERT INTO resource_allocations (work_order_id, resource_id, quantity_allocated, allocated_by, allocated_at)
@@ -325,17 +388,16 @@ def allocate_resource(wo_id):
         """,
         (wo_id, resource_id, qty_val, session['user_id'], datetime.datetime.now())
     )
-    
-    # Decrement available quantity
+
     execute_db(
         "UPDATE resources SET quantity = quantity - %s WHERE id = %s",
         (qty_val, resource_id)
     )
-    
+
     log_audit(
         'RESOURCE_ALLOCATED', 'WorkOrder', wo_id,
         f"Allocated {qty_val} {res['unit']} of {res['name']} to WO #{wo_id}"
     )
-    
+
     flash(f"Allocated {qty_val} {res['unit']} of '{res['name']}' to this work order.", 'success')
     return redirect(url_for('work_orders.detail', wo_id=wo_id))
