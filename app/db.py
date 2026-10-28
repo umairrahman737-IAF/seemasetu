@@ -124,6 +124,21 @@ def close_db(e=None):
             logger.debug(f"Error closing DB connection: {err}")
 
 
+import datetime
+
+def _clean_args_for_sqlite(args):
+    """Normalize datetime/date objects into standard strings for Python 3.12+ SQLite compatibility."""
+    cleaned = []
+    for a in args:
+        if isinstance(a, datetime.datetime):
+            cleaned.append(a.strftime('%Y-%m-%d %H:%M:%S'))
+        elif isinstance(a, datetime.date):
+            cleaned.append(a.isoformat())
+        else:
+            cleaned.append(a)
+    return tuple(cleaned)
+
+
 def query_db(sql, args=(), one=False):
     """
     Execute a parameterized SELECT query and return dictionary records.
@@ -134,9 +149,10 @@ def query_db(sql, args=(), one=False):
 
     if db_type == 'sqlite':
         translated_sql = sql.replace('%s', '?')
+        cleaned_args = _clean_args_for_sqlite(args)
         cursor = db.cursor()
         try:
-            cursor.execute(translated_sql, args)
+            cursor.execute(translated_sql, cleaned_args)
             rows = cursor.fetchall()
             result = [dict(row) for row in rows]
         finally:
@@ -170,9 +186,10 @@ def execute_db(sql, args=(), commit=True):
     try:
         if db_type == 'sqlite':
             translated_sql = sql.replace('%s', '?')
+            cleaned_args = _clean_args_for_sqlite(args)
             cursor = db.cursor()
             try:
-                cursor.execute(translated_sql, args)
+                cursor.execute(translated_sql, cleaned_args)
                 last_id = cursor.lastrowid
                 rowcount = cursor.rowcount
             finally:
