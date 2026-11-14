@@ -1,17 +1,50 @@
-
 # Python virtual environments
 .venv/
 venv/
+env/
+ENV/
 
-# Python cache
+# Python cache & bytecode
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Database files
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+
+# Uploads & local files
+uploads/
+app/static/uploads/issue_*
 
 # Environment secrets
 .env
 
-# Local uploaded files
-uploads/
-
-# Vercel local configuration
+# Cloud & Editor configurations
+.vscode/
+.idea/
 .vercel/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

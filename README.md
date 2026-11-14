@@ -1,76 +1,119 @@
-# SeemaSetu — Python + MySQL beginner project
+# SeemaSetu — Border Infrastructure Monitoring and Maintenance System
 
-This edition is designed around skills taught in a programming-language course: Python, SQL, basic HTML/CSS, and standard Python libraries. It uses Flask for routing, `mysql-connector-python` for database operations, and Werkzeug for password hashing. It does not require Tailwind, React, or SQLAlchemy.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://python.org)
+[![Framework](https://img.shields.io/badge/Framework-Flask%203.x-green.svg)](https://flask.palletsprojects.com/)
+[![Database](https://img.shields.io/badge/Database-MySQL%20%7C%20SQLite-orange.svg)](https://www.mysql.com/)
+[![License](https://img.shields.io/badge/Data-Fictional%20%26%20Unclassified-lightgrey.svg)](#)
 
-## A. Install
-Install Python 3.10+, VS Code, MySQL Server and MySQL Workbench.
+> **Demonstration Notice:** SeemaSetu is developed strictly using **fictional, synthetic, and non-sensitive demonstration data**. It contains no classified coordinates, real military installation details, tactical defense information, or operational troop movements. It is designed for undergraduate academic demonstration in Python, relational database engineering, cloud computing, and cybersecurity.
 
-## B. Create the database
-Open MySQL Workbench and execute `sql/schema.sql`. Then create an app account using a strong unique password:
+---
+
+## 🌟 Executive Summary
+
+**SeemaSetu** (सीमा सेतु — *Bridge to the Border*) is a centralized web platform engineered to monitor, score, assign, and coordinate maintenance for civil infrastructure in India's border sectors.
+
+In harsh high-altitude, desert, and riverine border corridors, damaged access roads, frozen borewells, failed security solar mast lights, and breached avalanche shelters cut off remote civilian communities and patrol lines. SeemaSetu provides:
+
+1. **Role-Based Incident Reporting:** Field defect submissions with photos, sector categorization, and parameterized input sanitation.
+2. **Deterministic Priority Scoring:** Objective multi-factor scoring combining severity, urgency, risk keywords, and critical infrastructure assets (bridges, tunnels).
+3. **Work Order Management & Financial Governance:** Direct assignment of engineering units and contractors with start/target dates, non-negative budget validation, and budget vs. actual expenditure comparison.
+4. **Logistics & Material Inventory Control:** Real-time depot stock tracking with low-stock warnings.
+5. **Interactive Executive Dashboard & Analytics:** Real-time visual metrics, status distribution, and cost summaries.
+6. **User Administration & RBAC:** Comprehensive administrative control panel to manage roles (`admin`, `engineer`, `maintenance`, `viewer`) and toggle account active status.
+7. **Immutable Security Audit Trail:** Chronological record of administrative operations and status transitions with operator IDs.
+
+---
+
+## 🚀 Quick Start (Python + MySQL Basics)
+
+This edition uses Flask for routing, `mysql-connector-python` for database operations, and Werkzeug for password hashing. It does not require external frontend frameworks.
+
+### A. Install Prerequisites
+Install Python 3.10+, VS Code, and MySQL Server (or MySQL Workbench).
+
+### B. Create the Database
+Open MySQL Workbench or your MySQL shell and execute `sql/schema.sql`. Then create an application user:
+
 ```sql
 CREATE USER 'seemasetu_app'@'localhost' IDENTIFIED BY 'Replace-With-A-Strong-Password';
 GRANT SELECT, INSERT, UPDATE, DELETE ON seemasetu.* TO 'seemasetu_app'@'localhost';
 FLUSH PRIVILEGES;
 ```
-For an existing installation, run `sql/migrate_issue_urgency.sql` instead of recreating the database schema.
+*For existing installations upgrading schema urgency levels, execute `sql/migrate_issue_urgency.sql`.*
 
-## C. Set up Python in VS Code
-Extract the ZIP and open the project folder in VS Code. Open Terminal > New Terminal:
+### C. Set up Virtual Environment & Dependencies
+Open your project folder in VS Code terminal:
+
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
-If PowerShell blocks activation, use Command Prompt: `.venv\\Scripts\\activate.bat`.
+*(If PowerShell execution policies block script activation, use Command Prompt: `.venv\Scripts\activate.bat`)*
 
-## D. Configure .env
-Copy `.env.example` to `.env` and enter the MySQL password you set. Never commit `.env` to GitHub.
+### D. Configure Environment (.env)
+Copy `.env.example` to `.env` and fill in your database credentials:
+```ini
+SECRET_KEY=your-random-secret-key
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=seemasetu
+DB_USER=seemasetu_app
+DB_PASSWORD=your_mysql_password
+```
 
-## E. Create the first administrator
-Run `python` in the VS Code terminal, then enter:
+### E. Create the First Administrator Account
+Run `python` in your terminal and execute:
 ```python
 from app import connect
 from werkzeug.security import generate_password_hash
 con = connect()
 cur = con.cursor()
-cur.execute("INSERT INTO users(name,email,password_hash,role) VALUES(%s,%s,%s,%s)", ("Project Admin","admin@example.com",generate_password_hash("Use-Your-Own-Demo-Password-123"),"admin"))
+cur.execute("INSERT INTO users(name,email,password_hash,role) VALUES(%s,%s,%s,%s)", ("Project Admin","admin@example.com",generate_password_hash("Admin@123"),"admin"))
 con.commit()
 cur.close()
 con.close()
 exit()
 ```
-Choose your own unique demo password. If `admin@example.com` already exists, use another email.
 
-## F. Start the app
+### F. Start the Application
 ```bash
 python app.py
 ```
-Open `http://127.0.0.1:5000`. Sign in with the admin account created above.
+Open `http://127.0.0.1:5000` in your web browser and sign in with the administrator account.
 
-## G. Test features
-1. Create a report using a fictional location such as `Demo Sector A / Road R-01`.
-   Choose an asset category, severity, and urgency; priority is capped at 5 and considers urgency, severity, risk keywords, and bridge/tunnel assets.
-2. Open it, assign a team and change its status.
-3. Create a work order and costs.
-4. Add sample resources; set a minimum-stock level to test alerts.
-5. Open Analytics, Users and Audit.
-6. Create a viewer account and check that it cannot perform write actions.
+---
 
-## Deploy to Vercel
-Vercel detects the Flask application in `app.py`. Before deploying, provision a hosted MySQL database that accepts connections from your deployment and run `sql/schema.sql` against it. Do not use `127.0.0.1` as the production database host.
+## 🧪 Testing Features
+1. **Create an Issue:** Report a defect using fictional sectors (e.g. `Demo Sector A / Road R-01`). Choose asset category, severity, and urgency.
+2. **Work Orders:** Assign a team, set task descriptions, estimated cost, and actual cost.
+3. **Logistics & Resources:** Add sample resources and set minimum stock levels to trigger low-stock alerts.
+4. **Analytics & Audit:** Review status breakdowns, cost tracking, and chronological audit entries.
+5. **Role-Based Access Control:** Create viewer accounts and verify that write/edit operations are restricted.
 
-Add these environment variables in the Vercel project settings for every environment you use:
+---
 
-- `SECRET_KEY`: a long, random secret value.
-- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`: connection details for the hosted MySQL database.
+## ☁️ Deployment Guide (Vercel & Cloud Database)
 
-The stylesheet is served from `public/static/`. Photo uploads on Vercel use temporary storage and may disappear between invocations; use persistent object storage before relying on photo uploads in production. The schema must be initialized separately; the app does not create database tables at startup.
+Vercel detects the Flask application in `app.py`. Before deploying:
+1. Provision a hosted MySQL database (such as TiDB Cloud Serverless, Aiven, or Azure Database for MySQL) that accepts inbound connections.
+2. Run `sql/schema.sql` against your hosted database.
+3. Configure these environment variables in your Vercel Project Settings:
+   - `SECRET_KEY`: Cryptographically secure random secret
+   - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`: Connection parameters
+4. Stylesheets are served from `public/static/`. Photo uploads on serverless platforms use temporary storage; for persistent storage, connect to cloud object storage (e.g. Azure Blob Storage or AWS S3).
 
-## H. Map to your assignment
-- System Design: draw architecture and ER diagrams using draw.io; document requirements, routes, data flow and trade-offs.
-- RDBMS: five tables, primary/foreign keys, constraints, indexes, joins and a view are in `sql/schema.sql`. Add the specific transaction and stored procedure/trigger examples required by your rubric.
-- DP-900: classify SQL rows as structured, JSON logs as semi-structured, and photos as unstructured; later configure Azure SQL, private Blob Storage and Power BI.
-- Cloud Security: test roles, password hashing, parameterized SQL, environment secrets, HTTPS, firewall/network rules and audit logs.
+---
 
-## Important
-The local app uses MySQL and local photo uploads. Azure SQL is not MySQL: it needs a compatible driver and SQL adaptations. Blob Storage integration and Power BI setup are later tasks. The priority score is a rule-based demonstration, not a trained ML model. This starter is for a student demo only; add CSRF protection, rate limiting, secure production configuration and thorough testing before public deployment. Use only fictional, non-sensitive infrastructure information.
+## 📚 Academic Documentation & Advanced Modular Architecture
+
+For full BTech CSE / Academic major project documentation, including:
+- Objectives and Scope
+- Mermaid System Architecture & Data Flow Diagrams
+- Mermaid Entity-Relationship (ER) Diagram
+- DP-900 Cloud Data Classification
+- OWASP Security Controls & Role-Permission Matrix
+- Automated Test Suite (`test_seemasetu.py`)
+
+Please refer to [`docs/ACADEMIC_DOCUMENTATION.md`](docs/ACADEMIC_DOCUMENTATION.md).

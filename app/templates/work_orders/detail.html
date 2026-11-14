@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Work Order {{ wo.work_order_no }} — SeemaSetu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div style="display: flex; gap: 0.6rem; align-items: center; margin-bottom: 0.35rem;">
+      <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">{{ wo.work_order_no }}</span>
+      <span class="status-pill status-{{ wo.status|replace(' ', '-') }}">{{ wo.status }}</span>
+      <span class="badge badge-medium">Progress: {{ wo.progress_percentage }}%</span>
+    </div>
+    <h1 class="page-title">{{ wo.contractor_or_unit }}</h1>
+    <p class="page-subtitle">Lead Engineer: <strong>{{ wo.lead_engineer }}</strong> &bull; Target: <strong>{{ wo.target_date|format_date }}</strong></p>
+  </div>
+  <div>
+    <a href="{{ url_for('work_orders.list_work_orders') }}" class="btn btn-secondary">&larr; Back to Work Orders</a>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1.15fr; gap: 1.5rem;">
+
+  <!-- Left Column: Mandate, Progress, and Allocated Inventory -->
+  <div>
+    <!-- Scope & Order Details -->
+    <div class="card">
+      <h3 class="card-title">Scope of Work &amp; Technical Mandate</h3>
+      <div style="white-space: pre-line; color: #334155; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1.5rem;">
+        {{ wo.scope_of_work }}
+      </div>
+
+      <div class="form-grid" style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Linked Issue Ticket</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">
+            <a href="{{ url_for('issues.detail', issue_id=wo.issue_id) }}">
+              {{ wo.ticket_number }}: {{ wo.issue_title }}
+            </a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Sector &amp; Location</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ wo.issue_sector }} &bull; {{ wo.location_name }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Start Date</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ wo.start_date|format_date }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Target Completion</div>
+          <div style="font-weight: 600; margin-top: 0.2rem;">{{ wo.target_date|format_date }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Estimated Budget</div>
+          <div style="font-weight: 600; margin-top: 0.2rem; color: var(--primary);">{{ wo.estimated_cost|currency }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Actual Cost Expended</div>
+          <div style="font-weight: 600; margin-top: 0.2rem; color: #b45309;">{{ wo.actual_cost|currency }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allocated Resources Section -->
+    <div class="card">
+      <h3 class="card-title">Allocated Maintenance Materials &amp; Equipment</h3>
+      {% if allocations %}
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Resource Code</th>
+                <th>Material / Asset</th>
+                <th>Quantity Allocated</th>
+                <th>Allocated By</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for alloc in allocations %}
+                <tr>
+                  <td><code>{{ alloc.resource_code }}</code></td>
+                  <td><strong>{{ alloc.resource_name }}</strong></td>
+                  <td>{{ alloc.quantity_allocated }} {{ alloc.unit }}</td>
+                  <td>{{ alloc.allocated_by_name }}</td>
+                  <td>{{ alloc.allocated_at|format_datetime }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">No resources allocated to this work order yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right Column: Progress Update & Resource Allocation Forms -->
+  <div>
+    <!-- Progress Execution Update -->
+    <div class="card">
+      <h3 class="card-title">Update Progress &amp; Status</h3>
+      <form method="POST" action="{{ url_for('work_orders.update_progress', wo_id=wo.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+          <label class="form-label" for="progress-slider">
+            Progress Percentage: <strong id="progress-slider-val">{{ wo.progress_percentage }}%</strong>
+          </label>
+          <input type="range" id="progress-slider" name="progress_percentage" min="0" max="100" step="5" value="{{ wo.progress_percentage }}" style="width: 100%; cursor: pointer;">
+          <div class="form-hint">Setting progress to 100% automatically marks order Completed and issue Resolved.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="wo-status">Work Order Status</label>
+          <select id="wo-status" name="status" class="form-control">
+            {% for st in statuses %}
+              <option value="{{ st }}" {% if wo.status == st %}selected{% endif %}>{{ st }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="actual_cost">Actual Expenditure Recorded (INR ₹)</label>
+          <input type="number" step="0.01" id="actual_cost" name="actual_cost" class="form-control" value="{{ wo.actual_cost }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Save Progress Update</button>
+      </form>
+    </div>
+
+    <!-- Allocate Additional Inventory Material -->
+    {% if session.get('role') in ['admin', 'officer'] %}
+      <div class="card">
+        <h3 class="card-title">Allocate Material From Inventory</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          Deduct equipment or materials from central border logistics depot and log usage.
+        </p>
+
+        <form method="POST" action="{{ url_for('work_orders.allocate_resource', wo_id=wo.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="form-group">
+            <label class="form-label" for="alloc-res-id">Select Inventory Item</label>
+            <select id="alloc-res-id" name="resource_id" class="form-control" required>
+              <option value="">-- Choose Item --</option>
+              {% for res in available_resources %}
+                <option value="{{ res.id }}">
+                  {{ res.name }} (Available: {{ res.quantity }} {{ res.unit }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="alloc-qty">Quantity to Allocate</label>
+            <input type="number" step="0.1" id="alloc-qty" name="quantity" class="form-control" placeholder="e.g. 5.0" required>
+          </div>
+
+          <button type="submit" class="btn btn-accent btn-block">Deduct &amp; Allocate Material</button>
+        </form>
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+{% endblock %}

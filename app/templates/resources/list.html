@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Logistics & Resources — SeemaSetu{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Border Logistics &amp; Resource Inventory</h1>
+    <p class="page-subtitle">Track road repair materials, emergency Bailey bridge kits, power generators, and pipes.</p>
+  </div>
+  {% if session.get('role') == 'admin' %}
+    <div>
+      <button type="button" class="btn btn-accent" onclick="document.getElementById('add-resource-panel').style.display = document.getElementById('add-resource-panel').style.display === 'none' ? 'block' : 'none';">
+        + Add New Material Asset
+      </button>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Summary Metrics Cards -->
+<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Catalogued Assets</div>
+    <div class="kpi-value">{{ total_items }}</div>
+    <div class="kpi-subtext">Across border staging depots</div>
+  </div>
+
+  <div class="kpi-card {% if low_stock_count > 0 %}kpi-danger{% else %}kpi-success{% endif %}">
+    <div class="kpi-label">Low Stock Alerts</div>
+    <div class="kpi-value" style="color: {% if low_stock_count > 0 %}var(--danger){% else %}var(--success){% endif %};">
+      {{ low_stock_count }}
+    </div>
+    <div class="kpi-subtext">Below minimum safety threshold</div>
+  </div>
+</div>
+
+<!-- Optional Add Resource Collapsible Panel -->
+{% if session.get('role') == 'admin' %}
+  <div id="add-resource-panel" class="card" style="display: none; border-left: 4px solid var(--accent); background: #fbfcfe;">
+    <h3 class="card-title">Register New Maintenance Asset in Logistics System</h3>
+    <form method="POST" action="{{ url_for('resources.add_resource') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="res-code">Resource Code <span class="required">*</span></label>
+          <input type="text" id="res-code" name="resource_code" class="form-control" placeholder="e.g. MAT-GEO-09" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-name">Asset / Material Name <span class="required">*</span></label>
+          <input type="text" id="res-name" name="name" class="form-control" placeholder="e.g. Geotextile Reinforcement Mesh Rolls" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-cat">Category <span class="required">*</span></label>
+          <select id="res-cat" name="category" class="form-control" required>
+            {% for cat in categories %}
+              <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-unit">Unit of Measure <span class="required">*</span></label>
+          <select id="res-unit" name="unit" class="form-control" required>
+            {% for u in units %}
+              <option value="{{ u }}">{{ u }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-qty">Initial Quantity <span class="required">*</span></label>
+          <input type="number" step="0.1" id="res-qty" name="quantity" class="form-control" value="0.0" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-threshold">Minimum Threshold Warning <span class="required">*</span></label>
+          <input type="number" step="0.1" id="res-threshold" name="min_threshold" class="form-control" value="10.0" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-cost">Unit Cost (INR ₹)</label>
+          <input type="number" step="0.01" id="res-cost" name="unit_cost" class="form-control" value="0.00">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="res-loc">Depot / Warehouse Location <span class="required">*</span></label>
+          <input type="text" id="res-loc" name="depot_location" class="form-control" placeholder="e.g. Northern Logistics Base - Staging Depot Alpha" required>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('add-resource-panel').style.display='none';">Cancel</button>
+        <button type="submit" class="btn btn-accent">Save Asset to Database</button>
+      </div>
+    </form>
+  </div>
+{% endif %}
+
+<!-- Multi-filter bar -->
+<form method="GET" action="{{ url_for('resources.list_resources') }}" class="filter-bar">
+  <div class="filter-item" style="flex: 2;">
+    <label class="form-label" style="font-size: 0.78rem;">Search</label>
+    <input type="text" name="search" class="form-control" placeholder="Search asset name, code, or depot..." value="{{ current_search }}">
+  </div>
+
+  <div class="filter-item">
+    <label class="form-label" style="font-size: 0.78rem;">Category</label>
+    <select name="category" class="form-control">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="filter-item" style="min-width: 140px;">
+    <label class="form-label" style="font-size: 0.78rem;">Stock Status</label>
+    <select name="low_stock" class="form-control">
+      <option value="">All Stock Levels</option>
+      <option value="1" {% if current_low_stock == '1' %}selected{% endif %}>Low Stock Only (&le; Min)</option>
+    </select>
+  </div>
+
+  <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('resources.list_resources') }}" class="btn btn-secondary">Reset</a>
+  </div>
+</form>
+
+<!-- Resources Table -->
+<div class="card">
+  {% if resources %}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Material / Asset</th>
+            <th>Category</th>
+            <th>Available Stock</th>
+            <th>Min Threshold</th>
+            <th>Depot Location</th>
+            <th>Est. Unit Cost</th>
+            {% if session.get('role') in ['admin', 'officer'] %}
+              <th>Quick Restock</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in resources %}
+            <tr>
+              <td><code>{{ res.resource_code }}</code></td>
+              <td>
+                <div style="font-weight: 700; color: var(--primary);">{{ res.name }}</div>
+              </td>
+              <td>{{ res.category }}</td>
+              <td>
+                <span style="font-weight: 800; font-size: 1.05rem; {% if res.quantity <= res.min_threshold %}color: var(--danger);{% else %}color: var(--success);{% endif %}">
+                  {{ res.quantity }} {{ res.unit }}
+                </span>
+                {% if res.quantity <= res.min_threshold %}
+                  <span class="badge badge-critical" style="margin-left: 0.35rem; font-size: 0.7rem;">LOW STOCK</span>
+                {% endif %}
+              </td>
+              <td style="color: var(--text-muted);">{{ res.min_threshold }} {{ res.unit }}</td>
+              <td style="font-size: 0.82rem;">{{ res.depot_location }}</td>
+              <td>{{ res.unit_cost|currency }}</td>
+              {% if session.get('role') in ['admin', 'officer'] %}
+                <td>
+                  <form method="POST" action="{{ url_for('resources.restock_resource', resource_id=res.id) }}" style="display: flex; gap: 0.35rem; align-items: center;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="number" step="0.5" name="add_quantity" class="form-control" style="width: 80px; padding: 0.25rem 0.4rem; font-size: 0.8rem;" placeholder="+Qty" required>
+                    <button type="submit" class="btn btn-sm btn-secondary" title="Add quantity to stock">+</button>
+                  </form>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+      <p style="font-size: 1.1rem; font-weight: 600;">No resources match current filter.</p>
+      <a href="{{ url_for('resources.list_resources') }}" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">Reset Filters</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

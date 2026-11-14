@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}System Error (500) — SeemaSetu{% endblock %}
+
+{% block content %}
+<div style="max-width: 550px; margin: 4rem auto; text-align: center;">
+  <div class="card" style="padding: 2.5rem 1.5rem;">
+    <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚙️</div>
+    <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--danger);">500 &mdash; Internal System Error</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0.75rem 0 1.5rem 0;">
+      An unexpected internal exception occurred while processing the request. This incident has been noted in the audit log.
+    </p>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Return to Operations Portal</a>
+  </div>
+</div>
+{% endblock %}

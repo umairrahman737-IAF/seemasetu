@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile — SeemaSetu{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">User Account &amp; Profile</h1>
+      <p class="page-subtitle">Authorized identity credentials and operational history.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display: flex; gap: 1.5rem; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800;">
+        {{ user.full_name[0] }}
+      </div>
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">{{ user.full_name }}</h2>
+        <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; gap: 0.75rem; align-items: center; margin-top: 0.25rem;">
+          <span>@{{ user.username }}</span>
+          <span>&bull;</span>
+          <span class="user-role-pill user-role-{{ user.role }}">{{ user.role }}</span>
+          <span>&bull;</span>
+          <span>Badge: {{ user.badge_number or 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-grid" style="margin-bottom: 1.5rem;">
+      <div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Department / Organization</div>
+        <div style="font-size: 1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.department }}</div>
+      </div>
+      <div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Email Address</div>
+        <div style="font-size: 1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.email }}</div>
+      </div>
+      <div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Issues Reported</div>
+        <div style="font-size: 1rem; font-weight: 600; margin-top: 0.2rem;">{{ my_issues_count }} ticket(s)</div>
+      </div>
+      <div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Account Created</div>
+        <div style="font-size: 1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.created_at|format_date }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Personal Activity Log -->
+  <div class="card">
+    <h3 class="card-title">Recent Activity Audit</h3>
+    {% if activity %}
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Entity</th>
+              <th>Details</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for act in activity %}
+              <tr>
+                <td>{{ act.created_at|format_datetime }}</td>
+                <td><code>{{ act.action }}</code></td>
+                <td>{{ act.entity_type }} #{{ act.entity_id }}</td>
+                <td>{{ act.details }}</td>
+                <td>{{ act.ip_address }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color: var(--text-muted); font-size: 0.9rem;">No recorded activity log yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

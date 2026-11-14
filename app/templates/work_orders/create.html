@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Create Work Order — SeemaSetu{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Issue Maintenance Work Order</h1>
+      <p class="page-subtitle">Assign an engineering unit or task force to resolve an active infrastructure defect.</p>
+    </div>
+    <a href="{{ url_for('work_orders.list_work_orders') }}" class="btn btn-secondary">&larr; Back to Work Orders</a>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="{{ url_for('work_orders.create') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-grid">
+        <!-- Target Issue -->
+        <div class="form-group full-width">
+          <label class="form-label" for="issue_id">Select Infrastructure Incident Ticket <span class="required">*</span></label>
+          <select id="issue_id" name="issue_id" class="form-control" required>
+            <option value="">-- Choose an Issue Ticket --</option>
+            {% for iss in available_issues %}
+              <option value="{{ iss.id }}" {% if preselected_issue_id and preselected_issue_id|int == iss.id %}selected{% endif %}>
+                [{{ iss.ticket_number }}] {{ iss.title }} ({{ iss.priority_level }} - {{ iss.sector }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Contractor / Unit -->
+        <div class="form-group">
+          <label class="form-label" for="contractor_or_unit">Contractor / Infrastructure Unit <span class="required">*</span></label>
+          <input type="text" id="contractor_or_unit" name="contractor_or_unit" class="form-control" placeholder="e.g. 74th Border Infrastructure Task Force" required>
+        </div>
+
+        <!-- Lead Engineer -->
+        <div class="form-group">
+          <label class="form-label" for="lead_engineer">Lead Engineer / Officer in Charge <span class="required">*</span></label>
+          <input type="text" id="lead_engineer" name="lead_engineer" class="form-control" placeholder="e.g. Er. Tenzin Dorjee" required>
+        </div>
+
+        <!-- Estimated Cost -->
+        <div class="form-group">
+          <label class="form-label" for="estimated_cost">Estimated Budget (INR ₹)</label>
+          <input type="number" step="0.01" id="estimated_cost" name="estimated_cost" class="form-control" placeholder="e.g. 150000.00" value="0.00">
+        </div>
+
+        <!-- Dates -->
+        <div class="form-group">
+          <label class="form-label" for="start_date">Deployment Start Date <span class="required">*</span></label>
+          <input type="date" id="start_date" name="start_date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="target_date">Target Completion Date <span class="required">*</span></label>
+          <input type="date" id="target_date" name="target_date" class="form-control" required>
+        </div>
+
+        <!-- Scope of Work -->
+        <div class="form-group full-width">
+          <label class="form-label" for="scope_of_work">Detailed Scope of Work &amp; Technical Mandate <span class="required">*</span></label>
+          <textarea id="scope_of_work" name="scope_of_work" class="form-control" placeholder="Specify required equipment, materials, excavation depth, safety measures, and technical standards to be followed..." required></textarea>
+        </div>
+
+        <!-- Initial Resource Allocation (Optional) -->
+        <div class="form-group">
+          <label class="form-label" for="resource_id">Allocate Initial Inventory Material (Optional)</label>
+          <select id="resource_id" name="resource_id" class="form-control">
+            <option value="">-- No material allocation upfront --</option>
+            {% for r in resources %}
+              <option value="{{ r.id }}">
+                {{ r.name }} (Stock: {{ r.quantity }} {{ r.unit }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="resource_quantity">Material Quantity to Deduct</label>
+          <input type="number" step="0.1" id="resource_quantity" name="resource_quantity" class="form-control" placeholder="e.g. 20">
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <a href="{{ url_for('work_orders.list_work_orders') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" style="padding: 0.7rem 1.75rem;">
+          Issue Work Order &rarr;
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
