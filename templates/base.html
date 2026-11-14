@@ -1,1 +1,64 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}SeemaSetu{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='style.css',v='3') }}"></head><body><header><div class="wrap nav"><a class="brand" href="{{ url_for('dashboard') if session.get('user') else url_for('login') }}"><span class="brand-mark" aria-hidden="true">SS</span><span>SeemaSetu<small>BORDER INFRASTRUCTURE MAINTENANCE</small></span></a>{% if session.get('user') %}<nav><a href="{{ url_for('dashboard') }}">Dashboard</a><a href="{{ url_for('issues') }}">Issues</a>{% if session['user']['role'] in ['admin','engineer','maintenance'] %}<a href="{{ url_for('new_issue') }}">Report issue</a>{% endif %}<a href="{{ url_for('work_orders') }}">Work orders</a><a href="{{ url_for('resources') }}">Resources</a><a href="{{ url_for('analytics') }}">Analytics</a>{% if session['user']['role']=='admin' %}<a href="{{ url_for('users') }}">Users</a><a href="{{ url_for('audit_page') }}">Audit</a>{% endif %}<span class="user-label">{{ session['user']['name'] }} · {{ session['user']['role'] }}</span><form method="post" action="{{ url_for('logout') }}"><button class="btn small">Sign out</button></form></nav>{% endif %}</div></header><main class="wrap main">{% for c,m in get_flashed_messages(with_categories=true) %}<p class="notice {{ c }}">{{ m }}</p>{% endfor %}{% block content %}{% endblock %}</main><footer><span class="footer-mark" aria-hidden="true"></span>Student prototype · fictional, non-sensitive infrastructure data</footer></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}SeemaSetu{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='style.css',v='4') }}">
+</head>
+<body>
+  <!-- National Tricolor Command Ribbon -->
+  <div style="height: 4px; background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%, #138808 100%);"></div>
+
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="{{ url_for('dashboard') if session.get('user') else url_for('login') }}">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="BRO" style="height: 36px; width: 36px;">
+          <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army" style="height: 36px; width: 36px;">
+        </div>
+        <span>SeemaSetu<small>BORDER INFRASTRUCTURE COMMAND &bull; BRO &amp; ARMY</small></span>
+      </a>
+      {% if session.get('user') %}
+      <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('issues') }}">Issues</a>
+        {% if session['user']['role'] in ['admin','engineer','maintenance'] %}
+        <a href="{{ url_for('new_issue') }}">Report issue</a>
+        {% endif %}
+        <a href="{{ url_for('work_orders') }}">Work orders</a>
+        <a href="{{ url_for('resources') }}">Resources</a>
+        <a href="{{ url_for('analytics') }}">Analytics</a>
+        {% if session['user']['role']=='admin' %}
+        <a href="{{ url_for('users') }}">Users</a>
+        <a href="{{ url_for('audit_page') }}">Audit</a>
+        {% endif %}
+        <span class="user-label">{{ session['user']['name'] }} · {{ session['user']['role'] }}</span>
+        <form method="post" action="{{ url_for('logout') }}"><button class="btn small">Sign out</button></form>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="wrap main">
+    {% for c,m in get_flashed_messages(with_categories=true) %}
+      <p class="notice {{ c }}">{{ m }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="BRO" style="height: 28px; width: 28px;">
+        <span>Border Roads Organisation &bull; श्रमेण सर्वं साध्यम्</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army" style="height: 28px; width: 28px;">
+        <span>Corps of Engineers &bull; सर्वत्र</span>
+      </div>
+    </div>
+    <span class="footer-mark" aria-hidden="true"></span>Student prototype · fictional, non-sensitive infrastructure demonstration data
+  </footer>
+</body>
+</html>

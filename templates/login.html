@@ -3,11 +3,15 @@
 {% block content %}
 <section class="welcome-hero">
   <div class="welcome-copy">
-    <p class="welcome-eyebrow"><span aria-hidden="true"></span> BORDER ROADS · CIVIL INFRASTRUCTURE</p>
+    <div style="display: flex; gap: 0.6rem; align-items: center; margin-bottom: 0.75rem;">
+      <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="Border Roads Organisation" style="height: 40px; width: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+      <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army Corps of Engineers" style="height: 40px; width: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+    </div>
+    <p class="welcome-eyebrow"><span aria-hidden="true"></span> BORDER ROADS ORGANISATION · CORPS OF ENGINEERS</p>
     <h1>Connecting the frontier.<br><span>Keeping every route ready.</span></h1>
-    <p class="welcome-description">A shared operations portal for reporting and coordinating maintenance across roads, bridges and essential infrastructure.</p>
+    <p class="welcome-description">A shared operations command portal for reporting and coordinating maintenance across forward roads, Bailey bridges, and lifeline infrastructure.</p>
     <a class="btn welcome-cta" href="#portal">Sign in to the portal <span aria-hidden="true">→</span></a>
-    <div class="welcome-caption"><span class="tricolor-mark" aria-hidden="true"></span> SEEMASETU <span>·</span> FICTIONAL TRAINING DATA</div>
+    <div class="welcome-caption"><span class="tricolor-mark" aria-hidden="true"></span> SEEMASETU <span>·</span> श्रमेण सर्वं साध्यम् <span>·</span> सर्वत्र</div>
   </div>
   <div class="welcome-landscape">
     <svg viewBox="0 0 760 400" role="img" aria-labelledby="welcome-landscape-title welcome-landscape-desc">
@@ -34,30 +38,30 @@
       <text x="30" y="69" fill="#405648" font-size="12" font-family="Arial,sans-serif" letter-spacing="2">FIELD ROUTE · 01</text>
       <rect x="520" y="326" width="216" height="44" rx="6" fill="#253b30" opacity=".91"/>
       <circle cx="539" cy="348" r="5" fill="#bfce91"/>
-      <text x="553" y="351" fill="#f3f1e6" font-size="10" font-family="Arial,sans-serif" letter-spacing="1.5">FRONTIER ROUTE</text>
-      <text x="553" y="363" fill="#d6cf9e" font-size="8" font-family="Arial,sans-serif" letter-spacing="1">TRAINING SECTOR · ACTIVE</text>
+      <text x="553" y="351" fill="#f3f1e6" font-size="10" font-family="Arial,sans-serif" letter-spacing="1.5">BORDER HIGHWAY</text>
+      <text x="553" y="363" fill="#d6cf9e" font-size="8" font-family="Arial,sans-serif" letter-spacing="1">BRO TASK FORCE · ACTIVE</text>
     </svg>
-    <div class="landscape-stamp"><span class="tricolor-mark" aria-hidden="true"></span> BUILT FOR THE LONG ROAD</div>
+    <div class="landscape-stamp"><span class="tricolor-mark" aria-hidden="true"></span> BORDER ROADS ORGANISATION</div>
   </div>
 </section>
 <div class="welcome-lower">
   <section class="portal-card" id="portal">
-    <p class="eyebrow">SECURE WORKSPACE</p>
+    <p class="eyebrow">COMMAND WORKSPACE</p>
     <h2>Sign in to SeemaSetu</h2>
-    <p class="muted">Use your assigned account to access field operations.</p>
+    <p class="muted">Use your assigned credentials to access field infrastructure operations.</p>
     <form method="post" class="stack">
       <label>Email<input type="email" name="email" autocomplete="username" required></label>
       <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
-      <button class="btn portal-submit">Sign in <span aria-hidden="true">→</span></button>
+      <button class="btn portal-submit">Sign in to Command <span aria-hidden="true">→</span></button>
     </form>
-    <p class="muted tiny">For this student prototype, create the first administrator using the README instructions.</p>
+    <p class="muted tiny">For this prototype, create the first administrator using the README instructions.</p>
   </section>
   <aside class="welcome-note">
-    <p class="eyebrow">FIELD OPERATIONS</p>
-    <h2>Infrastructure that connects.</h2>
-    <p>Keep maintenance reports and work orders in one clear view, built around practical field coordination.</p>
-    <div class="focus-list"><span><i aria-hidden="true">01</i>Roads &amp; routes</span><span><i aria-hidden="true">02</i>Bridges &amp; assets</span><span><i aria-hidden="true">03</i>Repairs &amp; resources</span></div>
-    <p class="training-note"><span class="status-pip" aria-hidden="true"></span> Fictional, non-sensitive training data only</p>
+    <p class="eyebrow">BRO &amp; ARMY TASK FORCE OPERATIONS</p>
+    <h2>Infrastructure that defends and connects.</h2>
+    <p>Keep maintenance reports, Bailey bridge spans, and work orders in one synchronized command view, built for rugged border conditions.</p>
+    <div class="focus-list"><span><i aria-hidden="true">01</i>High-altitude roads</span><span><i aria-hidden="true">02</i>Bailey bridges</span><span><i aria-hidden="true">03</i>Heavy equipment &amp; asphalt</span></div>
+    <p class="training-note"><span class="status-pip" aria-hidden="true"></span> Fictional, non-sensitive training demonstration data</p>
   </aside>
 </div>
 {% endblock %}

@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="broGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+    <linearGradient id="broRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#7F1D1D"/>
+    </linearGradient>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Outer Ring with Cog Teeth (Engineering Symbol) -->
+  <g id="cog-teeth" fill="url(#broGold)">
+    <circle cx="120" cy="120" r="108" fill="#B45309"/>
+    <!-- 16 cog teeth -->
+    <path d="M114 8 h12 v14 h-12 z" />
+    <path d="M114 218 h12 v14 h-12 z" />
+    <path d="M8 114 h14 v12 h-14 z" />
+    <path d="M218 114 h14 v12 h-14 z" />
+    <path d="M42 42 l8.5 -8.5 l8.5 8.5 l-8.5 8.5 z" />
+    <path d="M181 181 l8.5 -8.5 l8.5 8.5 l-8.5 8.5 z" />
+    <path d="M42 198 l-8.5 -8.5 l8.5 -8.5 l8.5 8.5 z" />
+    <path d="M181 59 l-8.5 -8.5 l8.5 -8.5 l8.5 8.5 z" />
+  </g>
+
+  <!-- Inner Crimson Circle -->
+  <circle cx="120" cy="120" r="98" fill="url(#broRed)" stroke="url(#broGold)" stroke-width="4" filter="url(#shadow)"/>
+
+  <!-- Border Roads Blue Sky Background -->
+  <circle cx="120" cy="120" r="82" fill="url(#skyGrad)"/>
+
+  <!-- Snow-capped Himalayan Mountains -->
+  <path d="M45 155 L85 95 L115 135 L145 80 L185 145 L195 155 Z" fill="#E2E8F0"/>
+  <path d="M85 95 L72 115 L95 115 Z" fill="#FFFFFF"/>
+  <path d="M145 80 L132 105 L158 105 Z" fill="#FFFFFF"/>
+  <path d="M45 155 L195 155 L180 170 L60 170 Z" fill="#64748B"/>
+
+  <!-- Winding Mountain Highway / Border Road -->
+  <path d="M120 125 Q135 145 100 160 Q80 172 120 198" fill="none" stroke="#F1F5F9" stroke-width="12" stroke-linecap="round"/>
+  <path d="M120 125 Q135 145 100 160 Q80 172 120 198" fill="none" stroke="#0F172A" stroke-width="9" stroke-linecap="round"/>
+  <!-- Road Center Dashed Line -->
+  <path d="M120 125 Q135 145 100 160 Q80 172 120 198" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="4,3"/>
+
+  <!-- Golden Laurel Wreath -->
+  <g fill="none" stroke="url(#broGold)" stroke-width="3" stroke-linecap="round">
+    <path d="M52 140 C42 110, 48 70, 78 50 C95 40, 110 42, 120 48"/>
+    <path d="M188 140 C198 110, 192 70, 162 50 C145 40, 130 42, 120 48"/>
+  </g>
+  <!-- Leaves -->
+  <g fill="url(#broGold)">
+    <circle cx="56" cy="120" r="4"/><circle cx="50" cy="100" r="4"/><circle cx="52" cy="80" r="4"/><circle cx="62" cy="62" r="4"/><circle cx="80" cy="50" r="4"/>
+    <circle cx="184" cy="120" r="4"/><circle cx="190" cy="100" r="4"/><circle cx="188" cy="80" r="4"/><circle cx="178" cy="62" r="4"/><circle cx="160" cy="50" r="4"/>
+  </g>
+
+  <!-- BRO Central Monogram Letters -->
+  <rect x="75" y="44" width="90" height="24" rx="4" fill="#1E293B" stroke="url(#broGold)" stroke-width="1.5"/>
+  <text x="120" y="61" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900" fill="#FCD34D" text-anchor="middle" letter-spacing="3">B R O</text>
+
+  <!-- Bottom Banner with Sanskrit Motto -->
+  <g filter="url(#shadow)">
+    <path d="M30 192 L50 182 L190 182 L210 192 L195 210 L45 210 Z" fill="#991B1B" stroke="url(#broGold)" stroke-width="2"/>
+    <text x="120" y="202" font-family="'Nirmala UI', 'Mangal', sans-serif" font-size="11.5" font-weight="800" fill="#FEF08A" text-anchor="middle">श्रमेण सर्वं साध्यम्</text>
+  </g>
+  <text x="120" y="222" font-family="'Segoe UI', sans-serif" font-size="7.5" font-weight="700" fill="#FCD34D" text-anchor="middle" letter-spacing="0.8">BORDER ROADS ORGANISATION</text>
+</svg>

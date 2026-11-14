@@ -23,6 +23,23 @@
   </div>
 </div>
 
+<!-- Operational Command Task Force Banner -->
+<div class="card" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; border-left: 4px solid #ea580c; box-shadow: var(--shadow-md);">
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.45rem;">
+      <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="BRO" style="height: 40px; width: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">
+      <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army" style="height: 40px; width: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">
+    </div>
+    <div>
+      <div style="font-size: 0.95rem; font-weight: 800; color: #fde047; letter-spacing: 0.03em;">BORDER ROADS TASK FORCE &bull; CORPS OF ENGINEERS JOINT COMMAND</div>
+      <div style="font-size: 0.78rem; color: #cbd5e1;">Active Sectors: Ladakh (Project Himank) &bull; Kashmir (Project Beacon) &bull; Kargil (Project Vijayak)</div>
+    </div>
+  </div>
+  <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <span style="font-size: 0.72rem; background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.25rem 0.55rem; border-radius: 4px; font-weight: 700;">● Network 98.4% Operational</span>
+  </div>
+</div>
+
 <!-- Low Stock Warning Banner if any -->
 {% if low_stock_resources %}
   <div class="alert alert-warning" style="margin-bottom: 1.5rem;">

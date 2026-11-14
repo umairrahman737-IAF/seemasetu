@@ -10,13 +10,22 @@
 </head>
 <body>
 
+  <!-- National Tricolor Command Ribbon -->
+  <div style="height: 4px; background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%, #138808 100%);"></div>
+
   <!-- Top Command Navigation Bar -->
   <nav class="navbar">
     <a href="{{ url_for('dashboard.index') }}" class="nav-brand">
-      <div class="brand-icon">SS</div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="Border Roads Organisation Crest" style="height: 38px; width: 38px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">
+        <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army Corps of Engineers Crest" style="height: 38px; width: 38px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">
+      </div>
       <div>
-        <span>SeemaSetu</span>
-        <span class="brand-subtitle">Border Infrastructure Maintenance</span>
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <span style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">SeemaSetu</span>
+          <span style="background: #ea580c; color: #ffffff; font-size: 0.62rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 3px; letter-spacing: 0.05em;">BRO &bull; ARMY</span>
+        </div>
+        <span class="brand-subtitle">Border Infrastructure Maintenance Command</span>
       </div>
     </a>
 
@@ -68,11 +77,39 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Application Footer -->
+  <!-- Application Footer with Military Insignia & Mottos -->
   <footer class="footer">
-    <div><strong>SeemaSetu</strong> &mdash; Border Infrastructure Monitoring and Maintenance System &copy; {{ current_year }}</div>
-    <div class="footer-disclaimer">
-      [Fictional Demonstration System] All border sectors, coordinates, tickets, and facility records are unclassified synthetic demonstration data.
+    <div style="max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+        <!-- BRO Unit Crest -->
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="Border Roads Organisation" style="height: 48px; width: 48px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+          <div style="text-align: left;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: #f1f5f9; letter-spacing: 0.04em;">BORDER ROADS ORGANISATION</div>
+            <div style="font-size: 0.75rem; color: #f59e0b; font-weight: 700;">श्रमेण सर्वं साध्यम् &bull; Everything is Achieved Through Hard Work</div>
+          </div>
+        </div>
+
+        <div style="width: 1px; height: 40px; background: #334155;"></div>
+
+        <!-- Indian Army Corps of Engineers Crest -->
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army Corps of Engineers" style="height: 48px; width: 48px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+          <div style="text-align: left;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: #f1f5f9; letter-spacing: 0.04em;">INDIAN ARMY &bull; CORPS OF ENGINEERS</div>
+            <div style="font-size: 0.75rem; color: #f59e0b; font-weight: 700;">सर्वत्र &bull; Everywhere in Service to the Nation</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height: 1px; width: 100%; background: #1e293b; margin: 0.25rem 0;"></div>
+
+      <div style="font-size: 0.88rem; color: #94a3b8;">
+        <strong>SeemaSetu</strong> &mdash; Border Infrastructure Monitoring and Maintenance System &copy; {{ current_year }}
+      </div>
+      <div class="footer-disclaimer">
+        [Fictional Academic Prototype] All forward border sectors, operational coordinates, defect tickets, and logistics records are unclassified synthetic demonstration data. Saluting the nation-builders of the Border Roads Organisation and the Indian Armed Forces.
+      </div>
     </div>
   </footer>
 

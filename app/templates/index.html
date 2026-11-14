@@ -3,42 +3,164 @@
 {% block title %}Home — Border Infrastructure Platform{% endblock %}
 
 {% block content %}
-<div style="max-width: 1040px; margin: 0 auto;">
+<div style="max-width: 1100px; margin: 0 auto;">
 
-  <!-- Hero Section -->
-  <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 2.75rem 2.25rem; border: none; margin-bottom: 2rem;">
-    <div style="display: flex; gap: 0.6rem; align-items: center; margin-bottom: 1rem;">
-      <span class="user-role-pill" style="background-color: #ea580c; font-size: 0.75rem;">Border Civil Works System</span>
-      <span style="font-size: 0.8rem; color: #cbd5e1;">Unclassified Demonstration Platform</span>
+  <!-- Hero Section with BRO & Army Background -->
+  <div class="card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.88) 100%), url('{{ url_for('static', filename='img/hero_bro_army.jpg') }}') center/cover no-repeat; color: #ffffff; padding: 3rem 2.5rem; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35); margin-bottom: 2rem;">
+    
+    <!-- Top Pill & Insignia Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+        <span class="user-role-pill" style="background-color: #ea580c; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.35rem 0.75rem;">
+          Border Roads Organisation &bull; Indian Army
+        </span>
+        <span style="font-size: 0.82rem; color: #cbd5e1; background: rgba(255,255,255,0.12); padding: 0.35rem 0.65rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
+          Unclassified Strategic Civil Works Platform
+        </span>
+      </div>
+
+      <!-- Official Insignia Badges -->
+      <div style="display: flex; align-items: center; gap: 1rem; background: rgba(15, 23, 42, 0.65); padding: 0.5rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px);">
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <img src="{{ url_for('static', filename='img/bro_crest.svg') }}" alt="Border Roads Organisation" style="height: 38px; width: 38px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+          <div style="text-align: left; line-height: 1.1;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #fde047;">BRO</div>
+            <div style="font-size: 0.62rem; color: #e2e8f0;">श्रमेण सर्वं साध्यम्</div>
+          </div>
+        </div>
+        <div style="width: 1px; height: 26px; background: rgba(255,255,255,0.25);"></div>
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <img src="{{ url_for('static', filename='img/indian_army_crest.svg') }}" alt="Indian Army Corps of Engineers" style="height: 38px; width: 38px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+          <div style="text-align: left; line-height: 1.1;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #fde047;">INDIAN ARMY</div>
+            <div style="font-size: 0.62rem; color: #e2e8f0;">सर्वत्र &bull; Engineers</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <h1 style="font-size: 2.4rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;">
+
+    <h1 style="font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
       SeemaSetu &mdash; Border Infrastructure Monitoring & Maintenance System
     </h1>
-    <p style="font-size: 1.08rem; color: #cbd5e1; max-width: 820px; line-height: 1.6; margin-bottom: 1.75rem;">
-      A specialized web application engineered to monitor, report, score, and coordinate maintenance for civil infrastructure in India's border sectors. Empowering field reporters and engineers to resolve road breaches, lifeline water outages, and power failures with transparent rule-based prioritization.
+    <p style="font-size: 1.12rem; color: #e2e8f0; max-width: 860px; line-height: 1.6; margin-bottom: 2rem; text-shadow: 0 1px 4px rgba(0,0,0,0.6);">
+      Centralized command portal engineered to monitor, report, score, and coordinate rapid maintenance for critical civil infrastructure across India's forward border corridors. Supporting Border Roads Task Forces (BRTF) and Indian Army Corps of Engineers in resolving road breaches, Bailey bridge damages, and winter cut-offs.
     </p>
 
     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
       {% if session.get('user_id') %}
-        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-accent" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
-          Go to Operations Dashboard &rarr;
+        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-accent" style="padding: 0.85rem 1.85rem; font-size: 1rem; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          Open Operations Dashboard &rarr;
         </a>
-        <a href="{{ url_for('issues.create_issue') }}" class="btn btn-secondary" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
-          + Submit Infrastructure Report
+        <a href="{{ url_for('issues.create_issue') }}" class="btn btn-secondary" style="padding: 0.85rem 1.85rem; font-size: 1rem; font-weight: 700; background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.3);">
+          + Submit Infrastructure Defect Report
         </a>
       {% else %}
-        <a href="{{ url_for('auth.login') }}" class="btn btn-accent" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-accent" style="padding: 0.85rem 1.85rem; font-size: 1rem; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
           Sign In to Portal &rarr;
         </a>
-        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary" style="padding: 0.85rem 1.85rem; font-size: 1rem; font-weight: 700; background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.3);">
           Register Reporter Account
         </a>
       {% endif %}
     </div>
   </div>
 
+  <!-- Operational Photography Gallery & Project Task Forces -->
+  <div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.25rem;">
+      <div>
+        <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+          <span>🎖️</span> Border Engineering & Strategic Infrastructure Operations
+        </h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.2rem;">
+          Coordinated civil maintenance supporting Border Roads Organisation (BRO) and Indian Army Corps of Engineers
+        </p>
+      </div>
+      <span style="font-size: 0.78rem; font-weight: 700; color: #ea580c; background: #fff7ed; padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid #fed7aa;">
+        Northern & Eastern Commands
+      </span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+      <!-- Photo Card 1: High-Altitude Pass Construction -->
+      <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+        <div style="position: relative; height: 210px; overflow: hidden;">
+          <img src="{{ url_for('static', filename='img/hero_bro_army.jpg') }}" alt="Himalayan Border Road Construction" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); color: #fde047; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 4px; border: 1px solid rgba(253, 224, 71, 0.3);">
+            PROJECT HIMANK &bull; LADAKH
+          </div>
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);"></div>
+        </div>
+        <div style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+              Strategic Mountain Highway Maintenance
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+              Stabilizing high-altitude passes across Khardung La, Chang La, and Zojila. Real-time logging of avalanche zones, snow-cutter deployment, and rockfall barrier repairs.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 0.75rem; font-size: 0.78rem;">
+            <span style="color: #64748b; font-weight: 600;">Sector: Northern Corridor</span>
+            <span style="color: #16a34a; font-weight: 700;">● Active Deployment</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photo Card 2: Modular Bailey Bridge Assembly -->
+      <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+        <div style="position: relative; height: 210px; overflow: hidden;">
+          <img src="{{ url_for('static', filename='img/bro_bailey_bridge.jpg') }}" alt="Modular Bailey Bridge Construction" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); color: #fde047; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 4px; border: 1px solid rgba(253, 224, 71, 0.3);">
+            CORPS OF ENGINEERS &bull; BRIDGING
+          </div>
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);"></div>
+        </div>
+        <div style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+              Rapid Modular Bailey Bridge Construction
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+              Rapid-span modular steel Bailey bridges assembled over roaring glacial torrents and flash-flood breaches, keeping supply lines open for forward defense posts and civilian hamlets.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 0.75rem; font-size: 0.78rem;">
+            <span style="color: #64748b; font-weight: 600;">Inventory: Steel Panels & Transoms</span>
+            <span style="color: #2563eb; font-weight: 700;">● Rapid Response</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photo Card 3: Winter Patrol & Defect Surveillance -->
+      <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+        <div style="position: relative; height: 210px; overflow: hidden;">
+          <img src="{{ url_for('static', filename='img/bro_patrol_convoy.jpg') }}" alt="Border Patrol Convoy & Road Inspection" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); color: #fde047; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 4px; border: 1px solid rgba(253, 224, 71, 0.3);">
+            PROJECT BEACON &bull; SURVEILLANCE
+          </div>
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);"></div>
+        </div>
+        <div style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+              Forward Artery & Pavement Surveillance
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+              Joint patrol inspections by field engineers and border reporters tagging frost heave fractures, slope instability, and culvert blocks using GPS-simulated coordinates.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 0.75rem; font-size: 0.78rem;">
+            <span style="color: #64748b; font-weight: 600;">Inspection: 4x4 Mobile Units</span>
+            <span style="color: #d97706; font-weight: 700;">● Continuous Patrol</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Demonstration Credentials Banner -->
-  <div class="card" style="border-left: 4px solid #f59e0b; background-color: #fffbeb;">
+  <div class="card" style="border-left: 4px solid #f59e0b; background-color: #fffbeb; margin-bottom: 2rem;">
     <h3 style="color: #92400e; font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
       <span>🔑</span> Demonstration Access Accounts (Pre-configured)
     </h3>
@@ -47,19 +169,28 @@
     </p>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
       <div style="background: #ffffff; padding: 0.85rem; border-radius: 6px; border: 1px solid #fde68a;">
-        <div style="font-weight: 700; color: #b45309;">Administrator (Full Access)</div>
+        <div style="font-weight: 700; color: #b45309; display: flex; align-items: center; justify-content: space-between;">
+          <span>Administrator (BRTF HQ)</span>
+          <span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; border-radius: 3px;">admin</span>
+        </div>
         <div style="font-size: 0.85rem; margin-top: 0.25rem;"><strong>Username:</strong> <code>admin</code></div>
         <div style="font-size: 0.85rem;"><strong>Password:</strong> <code>Admin@123</code></div>
         <div style="font-size: 0.75rem; color: #92400e; margin-top: 0.3rem;">Can manage work orders, assign resources, review audit logs.</div>
       </div>
       <div style="background: #ffffff; padding: 0.85rem; border-radius: 6px; border: 1px solid #fde68a;">
-        <div style="font-weight: 700; color: #b45309;">Field Officer (Engineer)</div>
+        <div style="font-weight: 700; color: #b45309; display: flex; align-items: center; justify-content: space-between;">
+          <span>Field Officer (Corps of Engineers)</span>
+          <span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; border-radius: 3px;">engineer</span>
+        </div>
         <div style="font-size: 0.85rem; margin-top: 0.25rem;"><strong>Username:</strong> <code>officer_sharma</code></div>
         <div style="font-size: 0.85rem;"><strong>Password:</strong> <code>Officer@123</code></div>
         <div style="font-size: 0.75rem; color: #92400e; margin-top: 0.3rem;">Can update work orders, track repairs, allocate inventory.</div>
       </div>
       <div style="background: #ffffff; padding: 0.85rem; border-radius: 6px; border: 1px solid #fde68a;">
-        <div style="font-weight: 700; color: #b45309;">Field Reporter (Patrol)</div>
+        <div style="font-weight: 700; color: #b45309; display: flex; align-items: center; justify-content: space-between;">
+          <span>Field Reporter (Border Patrol)</span>
+          <span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; border-radius: 3px;">reporter</span>
+        </div>
         <div style="font-size: 0.85rem; margin-top: 0.25rem;"><strong>Username:</strong> <code>reporter_amit</code></div>
         <div style="font-size: 0.85rem;"><strong>Password:</strong> <code>Reporter@123</code></div>
         <div style="font-size: 0.75rem; color: #92400e; margin-top: 0.3rem;">Can submit new problem tickets and view issue statuses.</div>
