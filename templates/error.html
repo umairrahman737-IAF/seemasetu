@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<section class="panel"><h1>Error {{ code }}</h1><p>{{ message }}</p><a class="btn" href="{{ url_for('dashboard') if session.get('user') else url_for('login') }}">Go back</a></section>{% endblock %}

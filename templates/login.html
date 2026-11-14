@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}SeemaSetu · Border Infrastructure{% endblock %}
+{% block content %}
+<section class="welcome-hero">
+  <div class="welcome-copy">
+    <p class="welcome-eyebrow"><span aria-hidden="true"></span> BORDER ROADS · CIVIL INFRASTRUCTURE</p>
+    <h1>Connecting the frontier.<br><span>Keeping every route ready.</span></h1>
+    <p class="welcome-description">A shared operations portal for reporting and coordinating maintenance across roads, bridges and essential infrastructure.</p>
+    <a class="btn welcome-cta" href="#portal">Sign in to the portal <span aria-hidden="true">→</span></a>
+    <div class="welcome-caption"><span class="tricolor-mark" aria-hidden="true"></span> SEEMASETU <span>·</span> FICTIONAL TRAINING DATA</div>
+  </div>
+  <div class="welcome-landscape">
+    <svg viewBox="0 0 760 400" role="img" aria-labelledby="welcome-landscape-title welcome-landscape-desc">
+      <title id="welcome-landscape-title">A mountain road winding across the frontier</title>
+      <desc id="welcome-landscape-desc">An illustrated high-altitude road curves through layered mountain ridges.</desc>
+      <defs>
+        <linearGradient id="welcome-sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c5d0ca"/><stop offset="1" stop-color="#e4d7b8"/></linearGradient>
+        <linearGradient id="welcome-ridge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7b897d"/><stop offset="1" stop-color="#435b50"/></linearGradient>
+        <linearGradient id="welcome-road" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#9c8b6c"/><stop offset="1" stop-color="#d8c49b"/></linearGradient>
+      </defs>
+      <rect width="760" height="400" fill="url(#welcome-sky)"/>
+      <circle cx="610" cy="86" r="37" fill="#f3e5bf" opacity=".8"/>
+      <path d="m0 226 118-111 71 67 111-138 108 130 90-91 128 121v196H0z" fill="#98a295"/>
+      <path d="m91 142 98 3 111-101 89 125-63-31-31 31-32-37-43 43-34-25-37 25-35-23z" fill="#e7e5d8"/>
+      <path d="M0 259 123 172l96 70 115-91 121 106 88-76 217 98v121H0Z" fill="url(#welcome-ridge)"/>
+      <path d="M0 310q119-67 217-28t184 0 177 10 182-33v141H0Z" fill="#566d59"/>
+      <path d="M0 361q109-48 205-32t185-17 197 39 173-31v80H0Z" fill="#354f41"/>
+      <path d="M760 299c-108 27-128 67-241 70-87 2-88-43-171-29-69 11-63 56-149 63-61 5-109-6-199 26" fill="none" stroke="#394a40" stroke-width="42" stroke-linecap="round"/>
+      <path d="M760 293c-108 27-128 67-241 70-87 2-88-43-171-29-69 11-63 56-149 63-61 5-109-6-199 26" fill="none" stroke="url(#welcome-road)" stroke-width="30" stroke-linecap="round"/>
+      <path d="M748 296c-103 28-123 64-230 68-86 3-88-43-168-29-66 11-64 56-146 62-61 5-108-7-190 24" fill="none" stroke="#f1e2bc" stroke-width="2" stroke-dasharray="9 12" opacity=".9"/>
+      <g fill="#f0e2c4" stroke="#3b5142" stroke-width="3"><circle cx="568" cy="239" r="10"/><circle cx="113" cy="356" r="10"/></g>
+      <g fill="#344b3b"><path d="M556 218h24v7h-24zM562 210h13v9h-13zM101 335h23v6h-23zM106 327h13v10h-13z"/></g>
+      <path d="M30 33h78M30 43h49" stroke="#fff" stroke-opacity=".65" stroke-width="3" stroke-linecap="round"/>
+      <text x="30" y="69" fill="#405648" font-size="12" font-family="Arial,sans-serif" letter-spacing="2">FIELD ROUTE · 01</text>
+      <rect x="520" y="326" width="216" height="44" rx="6" fill="#253b30" opacity=".91"/>
+      <circle cx="539" cy="348" r="5" fill="#bfce91"/>
+      <text x="553" y="351" fill="#f3f1e6" font-size="10" font-family="Arial,sans-serif" letter-spacing="1.5">FRONTIER ROUTE</text>
+      <text x="553" y="363" fill="#d6cf9e" font-size="8" font-family="Arial,sans-serif" letter-spacing="1">TRAINING SECTOR · ACTIVE</text>
+    </svg>
+    <div class="landscape-stamp"><span class="tricolor-mark" aria-hidden="true"></span> BUILT FOR THE LONG ROAD</div>
+  </div>
+</section>
+<div class="welcome-lower">
+  <section class="portal-card" id="portal">
+    <p class="eyebrow">SECURE WORKSPACE</p>
+    <h2>Sign in to SeemaSetu</h2>
+    <p class="muted">Use your assigned account to access field operations.</p>
+    <form method="post" class="stack">
+      <label>Email<input type="email" name="email" autocomplete="username" required></label>
+      <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="btn portal-submit">Sign in <span aria-hidden="true">→</span></button>
+    </form>
+    <p class="muted tiny">For this student prototype, create the first administrator using the README instructions.</p>
+  </section>
+  <aside class="welcome-note">
+    <p class="eyebrow">FIELD OPERATIONS</p>
+    <h2>Infrastructure that connects.</h2>
+    <p>Keep maintenance reports and work orders in one clear view, built around practical field coordination.</p>
+    <div class="focus-list"><span><i aria-hidden="true">01</i>Roads &amp; routes</span><span><i aria-hidden="true">02</i>Bridges &amp; assets</span><span><i aria-hidden="true">03</i>Repairs &amp; resources</span></div>
+    <p class="training-note"><span class="status-pip" aria-hidden="true"></span> Fictional, non-sensitive training data only</p>
+  </aside>
+</div>
+{% endblock %}

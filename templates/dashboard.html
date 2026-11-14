@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% block content %}
+<section class="mission-banner">
+  <div class="mission-copy">
+    <p class="eyebrow"><span class="status-pip"></span> BORDER ROADS · FIELD OPERATIONS</p>
+    <h1>Connecting the frontier.<br><span>Keeping every route ready.</span></h1>
+    <p class="mission-note">A shared operations view for roads, bridges and essential infrastructure.</p>
+    <a class="btn btn-light" href="{{ url_for('new_issue') }}">+ Report an issue</a>
+    <div class="mission-caption"><span class="flag-stripe" aria-hidden="true"></span> SEEMASETU <span>·</span> FICTIONAL TRAINING DATA</div>
+  </div>
+  <div class="terrain-art">
+    <svg viewBox="0 0 560 310" role="img" aria-labelledby="terrain-title terrain-desc">
+      <title id="terrain-title">Illustrated frontier road through mountain terrain</title>
+      <desc id="terrain-desc">A winding road crosses layered mountain ridges, connecting two outposts.</desc>
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d8dfc7"/><stop offset="1" stop-color="#a9b69a"/></linearGradient>
+        <linearGradient id="ridge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#76846b"/><stop offset="1" stop-color="#435b4c"/></linearGradient>
+        <linearGradient id="road" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8b8068"/><stop offset="1" stop-color="#d0b98b"/></linearGradient>
+      </defs>
+      <rect width="560" height="310" rx="18" fill="url(#sky)"/>
+      <circle cx="437" cy="68" r="28" fill="#f3e5bd" opacity=".8"/>
+      <path d="M0 164 93 73l51 48 78-92 83 92 62-68 113 105v152H0Z" fill="#879483" opacity=".68"/>
+      <path d="m75 120 69 1 78-92 61 87-48-20-20 18-21-26-31 31-22-17-25 17-28-13Z" fill="#e5e4d7" opacity=".88"/>
+      <path d="M0 190 96 128l64 51 84-68 85 81 68-60 163 70v108H0Z" fill="url(#ridge)"/>
+      <path d="M0 227q88-48 151-11t136 0 130 6 143-24v112H0Z" fill="#566d56"/>
+      <path d="M0 282q83-39 155-28t128-13 142 30 135-24v63H0Z" fill="#334e40"/>
+      <path d="M560 233c-81 19-93 54-178 55-63 1-65-31-126-22-50 7-44 42-108 47-45 3-81-4-148 20" fill="none" stroke="#394a40" stroke-width="31" stroke-linecap="round"/>
+      <path d="M560 229c-81 19-93 54-178 55-63 1-65-31-126-22-50 7-44 42-108 47-45 3-81-4-148 20" fill="none" stroke="url(#road)" stroke-width="23" stroke-linecap="round"/>
+      <path d="M552 229c-78 20-91 51-171 54-63 2-65-31-124-22-47 7-45 41-106 46-45 4-80-4-142 19" fill="none" stroke="#f0dfb6" stroke-width="1.5" stroke-dasharray="7 9" opacity=".85"/>
+      <g fill="#e9ddbd" stroke="#405547" stroke-width="3">
+        <circle cx="434" cy="189" r="8"/><circle cx="93" cy="292" r="8"/>
+      </g>
+      <g fill="#324638">
+        <path d="M424 170h20v5h-20zM428 164h12v7h-12zM86 273h14v4H86zM89 268h8v6h-8z"/>
+      </g>
+      <path d="M24 28h55M24 36h35" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+      <text x="24" y="58" fill="#405547" font-size="9" font-family="Arial,sans-serif" letter-spacing="2">FIELD ROUTE · 01</text>
+    </svg>
+    <div class="map-chip"><span></span> ROUTE NETWORK <b>ACTIVE</b></div>
+  </div>
+</section>
+<div class="section-label"><span>OPERATIONS SNAPSHOT</span><span>LIVE REPORT TOTALS</span></div>
+<div class="cards">{% for label,val,icon,tone in [('Total reports',stats.total,'↗','sage'),('Open issues',stats.open_count,'◷','sand'),('Critical issues',stats.critical_count,'!','rust'),('Resolved',stats.resolved_count,'✓','green')] %}<div class="panel metric-card"><span class="metric-icon {{ tone }}" aria-hidden="true">{{ icon }}</span><span class="muted">{{ label }}</span><strong class="number">{{ val or 0 }}</strong><span class="metric-foot">Infrastructure reports</span></div>{% endfor %}</div>
+<section class="panel recent-panel"><div class="panel-heading"><div><p class="eyebrow">FIELD LOG</p><h2>Recent reports</h2></div><a class="text-link" href="{{ url_for('issues') }}">View all reports <span aria-hidden="true">→</span></a></div><div class="tablewrap"><table><tr><th>Issue</th><th>Location</th><th>Severity</th><th>Status</th></tr>{% for i in recent %}<tr><td><a href="{{ url_for('issue_detail',iid=i.id) }}">#{{ i.id }} · {{ i.title }}</a></td><td>{{ i.simulated_location }}</td><td><span class="severity-tag {{ i.severity|lower }}">{{ i.severity }}</span></td><td>{{ i.status }}</td></tr>{% else %}<tr><td colspan="4">No reports yet. Click Report issue to add one.</td></tr>{% endfor %}</table></div></section>
+{% endblock %}

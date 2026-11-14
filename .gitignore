@@ -1,0 +1,17 @@
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment secrets
+.env
+
+# Local uploaded files
+uploads/
+
+# Vercel local configuration
+.vercel/

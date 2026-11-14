@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block content %}
+<div class="page-heading"><p class="eyebrow">OPERATIONS INTELLIGENCE</p><h1>Maintenance analytics</h1><p class="muted">A visual readout of fictional infrastructure reports and field resources.</p></div>
+<div class="cards analytics-metrics">
+  <section class="panel metric-card"><span class="metric-icon sage" aria-hidden="true">₹</span><span class="muted">Estimated costs</span><strong class="number">₹{{ costs.estimated }}</strong><span class="metric-foot">Across all work orders</span></section>
+  <section class="panel metric-card"><span class="metric-icon sand" aria-hidden="true">₹</span><span class="muted">Actual costs</span><strong class="number">₹{{ costs.actual }}</strong><span class="metric-foot">Recorded work order spend</span></section>
+  <section class="panel metric-card"><span class="metric-icon rust" aria-hidden="true">!</span><span class="muted">Low-stock resources</span><strong class="number">{{ low_stock }}</strong><span class="metric-foot">At or below minimum stock</span></section>
+</div>
+<div class="twocol chart-grid">
+  <section class="panel chart-panel">
+    <div class="panel-heading"><div><p class="eyebrow">WORK PIPELINE</p><h2>Reports by status</h2></div><span class="chart-mark" aria-hidden="true">01</span></div>
+    {% set status_max = by_status|map(attribute='total')|max if by_status else 1 %}
+    {% for x in by_status %}<div class="bar-row"><div class="bar-label"><span>{{ x.status }}</span><b>{{ x.total }}</b></div><div class="bar-track"><span class="bar-fill status-fill" style="width: {{ (x.total / status_max * 100)|round }}%"></span></div></div>{% else %}<p class="muted empty-chart">No report data to visualize yet.</p>{% endfor %}
+  </section>
+  <section class="panel chart-panel">
+    <div class="panel-heading"><div><p class="eyebrow">FIELD PRIORITY</p><h2>Reports by severity</h2></div><span class="chart-mark" aria-hidden="true">02</span></div>
+    {% set severity_max = by_severity|map(attribute='total')|max if by_severity else 1 %}
+    {% for x in by_severity %}<div class="bar-row"><div class="bar-label"><span><i class="severity-dot {{ x.severity|lower }}" aria-hidden="true"></i>{{ x.severity }}</span><b>{{ x.total }}</b></div><div class="bar-track"><span class="bar-fill severity-fill {{ x.severity|lower }}" style="width: {{ (x.total / severity_max * 100)|round }}%"></span></div></div>{% else %}<p class="muted empty-chart">No report data to visualize yet.</p>{% endfor %}
+  </section>
+</div>
+<div class="analytics-note"><span class="note-icon" aria-hidden="true">i</span><p><strong>Reading the field picture</strong><br>Bar lengths compare report counts within each chart. All figures use the project database and fictional training data.</p></div>
+{% endblock %}
